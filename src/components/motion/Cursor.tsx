@@ -35,7 +35,7 @@ export default function Cursor() {
   return (
     <motion.div
       aria-hidden
-      className="pointer-events-none fixed left-0 top-0 z-[70] mix-blend-difference"
+      className={`pointer-events-none fixed left-0 top-0 z-[70] ${label ? "" : "mix-blend-difference"}`}
       style={{ x: sx, y: sy }}
     >
       <motion.div
@@ -43,7 +43,7 @@ export default function Cursor() {
         animate={{
           width: size,
           height: size,
-          backgroundColor: label ? "rgba(246,238,223,1)" : hover ? "rgba(246,238,223,0)" : "rgba(246,238,223,1)",
+          backgroundColor: label ? "rgba(232,130,12,1)" : hover ? "rgba(246,238,223,0)" : "rgba(246,238,223,1)",
           borderWidth: hover && !label ? 1 : 0,
         }}
         style={{ borderColor: "#f6eedf", borderStyle: "solid" }}

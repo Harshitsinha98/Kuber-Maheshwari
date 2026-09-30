@@ -45,6 +45,9 @@ body {
   overflow-x: clip;
 }
 
+:focus:not(:focus-visible) { outline: none; }
+:focus-visible { outline: 1px solid color-mix(in srgb, var(--color-gold) 70%, transparent); outline-offset: 3px; }
+
 ::selection {
   background: var(--color-saffron);
   color: var(--color-night);

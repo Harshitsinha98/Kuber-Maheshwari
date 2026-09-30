@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { fmtTime, rupees, toLocalIST } from "@/lib/format";
+import { fmtTime, inr, rupees, toLocalIST } from "@/lib/format";
 import { remainingSeats } from "@/lib/tickets";
 import { guard } from "../../guard";
 import { Badge, Card, PageTitle, btnGhost } from "../../ui";
@@ -66,14 +66,16 @@ export default async function EditEvent({ params, searchParams }: { params: Prom
         </Card>
         <Card>
           <p className="text-xs uppercase tracking-widest text-ink/50">Revenue</p>
-          <p className="mt-1 font-display text-3xl">{rupees(revenue)}</p>
+          <p className="mt-1 font-display text-3xl">{inr(revenue)}</p>
         </Card>
         <Card>
-          <p className="text-xs uppercase tracking-widest text-ink/50">Seats left</p>
+          <p className="text-xs uppercase tracking-widest text-ink/50">Price · Seats left</p>
           <div className="mt-1 space-y-0.5 text-sm">
             {left.map(({ t, left }) => (
-              <div key={t.id} className="flex justify-between">
-                <span>{t.name}</span>
+              <div key={t.id} className="flex justify-between gap-2">
+                <span>
+                  {t.name} <span className={t.price === 0 ? "text-amber-700" : "text-ink/50"}>· {rupees(t.price)}</span>
+                </span>
                 <span className="tabular-nums">{left}</span>
               </div>
             ))}

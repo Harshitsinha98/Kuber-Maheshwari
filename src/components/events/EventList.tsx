@@ -45,7 +45,7 @@ export default function EventList({ events, past = false }: { events: EventCard[
               <Link
                 href={`/events/${e.slug}`}
                 data-cursor={past ? "View" : "Tickets"}
-                className="group grid grid-cols-[72px_1fr_auto] items-center gap-4 py-7 md:grid-cols-[120px_1fr_220px_160px] md:gap-8 md:py-9"
+                className="group grid grid-cols-[72px_1fr_auto] items-center gap-4 py-7 outline-none focus-visible:ring-1 focus-visible:ring-gold/60 md:grid-cols-[120px_1fr_220px_160px] md:gap-8 md:py-9"
               >
                 <div className="text-center md:text-left">
                   <div className="font-display text-5xl leading-none text-gold md:text-6xl">{d.day}</div>
@@ -68,7 +68,7 @@ export default function EventList({ events, past = false }: { events: EventCard[
                 </div>
                 <div className="flex items-center justify-end gap-4">
                   <span className="hidden text-sm text-ivory/80 md:block">
-                    {cancelled ? "Cancelled" : past ? "" : e.fromPrice === null ? "" : e.fromPrice === 0 ? "Free entry" : `from ${rupees(e.fromPrice)}`}
+                    {cancelled ? "Cancelled" : past ? "" : e.fromPrice === null ? "" : e.fromPrice === 0 ? "Free entry" : `From ${rupees(e.fromPrice)}`}
                   </span>
                   <span className="flex h-12 w-12 items-center justify-center rounded-full border border-ivory/20 transition-all duration-500 group-hover:rotate-45 group-hover:border-gold group-hover:bg-gold group-hover:text-night">
                     <ArrowIcon className="h-4 w-4" />
@@ -89,7 +89,7 @@ export default function EventList({ events, past = false }: { events: EventCard[
               animate={{ opacity: 1, scale: 1, rotate: -3 }}
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-              className="relative -ml-32 -mt-44 h-72 w-56 overflow-hidden shadow-2xl"
+              className="relative -mt-36 ml-10 h-60 w-44 overflow-hidden shadow-2xl ring-1 ring-ivory/10"
             >
               <Image src={current.posterUrl || fallbackPoster} alt="" fill sizes="224px" className="object-cover" />
             </motion.div>

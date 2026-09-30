@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { fmtDate, rupees } from "@/lib/format";
+import { fmtDate, inr } from "@/lib/format";
 import { guard } from "./guard";
 import { Card, PageTitle, btn } from "./ui";
 
@@ -25,7 +25,7 @@ export default async function Dashboard() {
 
   const stats = [
     ["Upcoming events", upcoming],
-    ["Revenue", rupees(paid._sum.amount || 0)],
+    ["Revenue", inr(paid._sum.amount || 0)],
     ["Tickets sold", tickets],
     ["Checked in", checked],
     ["New enquiries", newEnq],

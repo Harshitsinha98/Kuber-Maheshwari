@@ -34,7 +34,10 @@ export default function EventForm({ id, d }: { id: string | null; d: EventDefaul
   }, undefined);
   const [types, setTypes] = useState<TT[]>(d.ticketTypes.length ? d.ticketTypes : [{ name: "General", description: "", price: 0, capacity: 200, maxPerOrder: 10 }]);
 
-  const set = (i: number, k: keyof TT, v: string) => setTypes((ts) => ts.map((t, j) => (j === i ? { ...t, [k]: k === "name" || k === "description" ? v : Number(v) } : t)));
+  const set = (i: number, k: keyof TT, v: string) =>
+    setTypes((ts) =>
+      ts.map((t, j) => (j === i ? { ...t, [k]: k === "name" || k === "description" ? v : Number(v.replace(/[^\d.]/g, "")) || 0 } : t))
+    );
 
   return (
     <form action={action} className="space-y-6">
@@ -105,8 +108,11 @@ export default function EventForm({ id, d }: { id: string | null; d: EventDefaul
               <input className="admin-input" placeholder="Name (VIP, General…)" value={t.name} onChange={(e) => set(i, "name", e.target.value)} required />
               <input className="admin-input" placeholder="Description" value={t.description} onChange={(e) => set(i, "description", e.target.value)} />
               <label className="text-xs text-ink/60">
-                Price ₹ (0 = free)
-                <input className="admin-input" type="number" min={0} value={t.price} onChange={(e) => set(i, "price", e.target.value)} />
+                Price ₹{" "}
+                <span className={`ml-1 rounded px-1.5 py-0.5 text-[10px] font-semibold ${t.price > 0 ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800"}`}>
+                  {t.price > 0 ? `₹${t.price.toLocaleString("en-IN")}` : "FREE"}
+                </span>
+                <input className="admin-input" inputMode="numeric" value={t.price === 0 ? "0" : String(t.price)} onChange={(e) => set(i, "price", e.target.value)} onFocus={(e) => e.target.select()} />
               </label>
               <label className="text-xs text-ink/60">
                 Capacity

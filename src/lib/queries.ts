@@ -29,10 +29,17 @@ const cardSelect = {
 
 type Row = { ticketTypes: { price: number }[]; startsAt: Date } & Omit<EventCard, "fromPrice" | "startsAt">;
 
+/** Lowest paid price; 0 only if every ticket type is free; null if none. */
+const lowestPrice = (prices: number[]) => {
+  if (!prices.length) return null;
+  const paid = prices.filter((p) => p > 0);
+  return paid.length ? Math.min(...paid) : 0;
+};
+
 const toCard = (e: Row): EventCard => ({
   ...e,
   startsAt: e.startsAt.toISOString(),
-  fromPrice: e.ticketTypes.length ? Math.min(...e.ticketTypes.map((t) => t.price)) : null,
+  fromPrice: lowestPrice(e.ticketTypes.map((t) => t.price)),
 });
 
 export const getUpcomingEvents = (take = 20) =>
