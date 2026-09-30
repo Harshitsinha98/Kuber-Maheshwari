@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { compressImage } from "@/lib/compress-image";
 import { saveEvent, type FormState } from "../actions";
 import { btn, btnGhost } from "../ui";
 
@@ -26,7 +27,11 @@ export type EventDefaults = {
 const categories = ["Bhajan Sandhya", "Sundarkand", "Bhajan Clubbing", "Bhakti Fusion", "Mata Jagran", "Shyam Kirtan", "Concert"];
 
 export default function EventForm({ id, d }: { id: string | null; d: EventDefaults }) {
-  const [state, action, pending] = useActionState<FormState, FormData>(saveEvent.bind(null, id), undefined);
+  const [state, action, pending] = useActionState<FormState, FormData>(async (prev, fd) => {
+    const poster = fd.get("posterFile");
+    if (poster instanceof File && poster.size > 0) fd.set("posterFile", await compressImage(poster));
+    return saveEvent(id, prev, fd);
+  }, undefined);
   const [types, setTypes] = useState<TT[]>(d.ticketTypes.length ? d.ticketTypes : [{ name: "General", description: "", price: 0, capacity: 200, maxPerOrder: 10 }]);
 
   const set = (i: number, k: keyof TT, v: string) => setTypes((ts) => ts.map((t, j) => (j === i ? { ...t, [k]: k === "name" || k === "description" ? v : Number(v) } : t)));

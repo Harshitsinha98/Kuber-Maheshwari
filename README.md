@@ -28,12 +28,23 @@ npm run dev
 
 Sign in with a Google account listed in `ADMIN_EMAILS` to get the admin panel.
 
-## Deploy (recommended: Vercel + Supabase, all on the owner's accounts)
+## Deploy on Vercel (all accounts in the owner's name)
 
-1. **Supabase** → new project → *Connect* → copy the pooled URL (port 6543, add `?pgbouncer=true`) into `DATABASE_URL` and the direct URL (5432) into `DIRECT_URL`. Run `npm run db:push` once.
-2. **Vercel** → import this GitHub repo → add all env vars → deploy → add the custom domain.
-3. **Vercel Blob** → Storage → create Blob store → connect to project (sets `BLOB_READ_WRITE_TOKEN`). Needed for admin photo uploads.
-4. The weekly cron (`vercel.json`) calls `/api/cron/social`. Set `CRON_SECRET`; Vercel sends it automatically.
+1. **Database (Supabase)**: new project, region *Mumbai (ap-south-1)* → *Connect* → ORMs → Prisma.
+   - `DATABASE_URL` = pooled URL (port **6543**) + `?pgbouncer=true&connection_limit=1`
+   - `DIRECT_URL` = direct/session URL (port **5432**)
+   - Create the tables once from your computer: `DATABASE_URL=... DIRECT_URL=... npx prisma db push`
+2. **Vercel**: *Add New → Project* → import `Kuber-Maheshwari` from GitHub. Framework is detected as Next.js; no build settings to change. Region: Settings → Functions → **Mumbai (bom1)** (keep it close to the database).
+3. **Environment variables** (Settings → Environment Variables, *Production*): everything from `.env.example`. Minimum for the first working deploy: `DATABASE_URL`, `DIRECT_URL`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `NEXT_PUBLIC_SITE_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `ADMIN_EMAILS`, `TICKET_SIGNING_SECRET`, `CRON_SECRET`. Razorpay, Resend and Meta keys can be added later; redeploy after adding.
+4. **Blob storage**: Storage → Create → Blob → connect to the project (adds `BLOB_READ_WRITE_TOKEN`). Needed for admin photo/poster uploads.
+5. **Domain**: Settings → Domains → add the domain and set the DNS records Vercel shows at your registrar. Then set `NEXTAUTH_URL` and `NEXT_PUBLIC_SITE_URL` to `https://<domain>`, add `https://<domain>/api/auth/callback/google` in Google Cloud, and redeploy.
+6. **Cron**: `vercel.json` runs `/api/cron/social` every Monday; Vercel sends `CRON_SECRET` automatically.
+
+Every push to `main` then deploys automatically; pull requests get a preview URL.
+
+The build works even before the database is connected (pages fall back to the built-in photos), so the first deploy won't fail while you're still setting up accounts.
+
+**Upload size:** Vercel limits a request to 4.5 MB, so the admin panel shrinks photos in the browser and uploads them one at a time before sending.
 
 ### Google login
 Google Cloud Console → APIs & Services → Credentials → *OAuth client ID* (Web). Authorised redirect URI: `https://<domain>/api/auth/callback/google`. Put ID/secret in `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`. Publish the OAuth consent screen.
@@ -69,4 +80,7 @@ Also set `NEXT_PUBLIC_INSTAGRAM_URL`, `NEXT_PUBLIC_FACEBOOK_URL`, `NEXT_PUBLIC_Y
 See [`.env.example`](.env.example). Every secret stays on the server; nothing sensitive is exposed to the browser.
 
 ## Running costs
-Vercel, Supabase, Resend and Vercel Blob free tiers are enough to launch. Razorpay charges its standard per-transaction fee only on paid tickets. The only fixed yearly cost is the domain.
+- **Vercel:** the free *Hobby* plan is for personal, non-commercial use only ([fair use guidelines](https://vercel.com/docs/limits/fair-use-guidelines)). A site that sells tickets and takes bookings is commercial, so production needs **Pro, $20/month** (includes $20 usage credit). Hobby is fine for a private preview/demo.
+- **Supabase, Resend, Vercel Blob:** free tiers are enough to launch.
+- **Razorpay:** standard per-transaction fee, only on paid tickets.
+- **Domain:** yearly renewal.

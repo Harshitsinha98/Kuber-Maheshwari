@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Default is 1 MB. Photos are compressed in the browser first; 4 MB stays under Vercel's 4.5 MB cap.
+  experimental: { serverActions: { bodySizeLimit: "4mb" } },
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
