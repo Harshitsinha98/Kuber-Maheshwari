@@ -42,6 +42,16 @@ export default async function EditEvent({ params, searchParams }: { params: Prom
         </a>
       </PageTitle>
       {saved && <p className="mb-4 rounded-lg bg-green-50 p-3 text-sm text-green-800">Saved ✓</p>}
+      {e.status === "DRAFT" && (
+        <p className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+          <b>This event is a Draft and is hidden from the website.</b> To show it, change <b>Status → Published</b> below and click Save changes.
+        </p>
+      )}
+      {e.status === "PUBLISHED" && e.startsAt.getTime() < Date.now() - 6 * 3600e3 && (
+        <p className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+          <b>This event&apos;s date has passed</b>, so it shows under Past events and bookings are closed. Check the start date/time.
+        </p>
+      )}
 
       <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
         <Card>

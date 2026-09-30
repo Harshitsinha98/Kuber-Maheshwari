@@ -63,11 +63,12 @@ export const getPastEvents = (take = 12) =>
     [] as EventCard[]
   );
 
-export const getEvent = (slug: string) =>
+/** includeDrafts: admins can preview an event before publishing it. */
+export const getEvent = (slug: string, includeDrafts = false) =>
   safe(
     () =>
       prisma.event.findFirst({
-        where: { slug, status: { in: ["PUBLISHED", "CANCELLED"] } },
+        where: { slug, ...(includeDrafts ? {} : { status: { in: ["PUBLISHED", "CANCELLED"] } }) },
         include: { ticketTypes: { orderBy: [{ sortOrder: "asc" }, { price: "asc" }] } },
       }),
     null

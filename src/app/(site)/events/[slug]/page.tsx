@@ -6,6 +6,7 @@ import { remainingSeats } from "@/lib/tickets";
 import { fmtDate, fmtTime } from "@/lib/format";
 import { razorpayEnabled } from "@/lib/razorpay";
 import { site } from "@/lib/site";
+import { getSession } from "@/lib/auth";
 import { Reveal, SplitText } from "@/components/motion/Reveal";
 import TicketPicker from "@/components/events/TicketPicker";
 
@@ -24,8 +25,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function EventPage({ params }: Props) {
-  const e = await getEvent((await params).slug);
+  const isAdmin = (await getSession())?.user?.role === "ADMIN";
+  const e = await getEvent((await params).slug, isAdmin);
   if (!e) notFound();
+  const draft = e.status === "DRAFT";
 
   const types = await Promise.all(
     e.ticketTypes.map(async (t) => ({
@@ -66,6 +69,11 @@ export default async function EventPage({ params }: Props) {
           <p className="text-xs uppercase tracking-[0.35em] text-saffron">{e.category}</p>
           <SplitText as="h1" immediate text={e.title} className="mt-4 block max-w-5xl font-display text-5xl leading-[0.95] text-ivory md:text-8xl" />
           {e.subtitle && <p className="mt-4 max-w-2xl text-lg text-ivory/75">{e.subtitle}</p>}
+          {draft && (
+            <p className="mt-6 inline-block rounded-full bg-marigold px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-night">
+              Draft preview · only admins can see this. Set status to Published to show it on the website.
+            </p>
+          )}
           {e.status === "CANCELLED" && (
             <p className="mt-6 inline-block rounded-full bg-kumkum px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em]">This event has been cancelled</p>
           )}
@@ -116,8 +124,8 @@ export default async function EventPage({ params }: Props) {
           <TicketPicker
             event={{ id: e.id, slug: e.slug, title: e.title }}
             types={types}
-            disabled={e.status === "CANCELLED" || past}
-            disabledReason={e.status === "CANCELLED" ? "Event cancelled" : past ? "This event has ended" : undefined}
+            disabled={e.status === "CANCELLED" || past || draft}
+            disabledReason={draft ? "Not published yet" : e.status === "CANCELLED" ? "Event cancelled" : past ? "This event has ended" : undefined}
             paymentsEnabled={razorpayEnabled()}
           />
         </aside>
