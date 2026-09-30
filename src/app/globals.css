@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+@theme {
+  --color-night: #0f0a0b;
+  --color-night-2: #171012;
+  --color-ink: #1d1416;
+  --color-maroon: #6e1a26;
+  --color-kumkum: #9e2a2b;
+  --color-saffron: #e8820c;
+  --color-marigold: #f3a53a;
+  --color-gold: #d4a64a;
+  --color-gold-soft: #e9cf92;
+  --color-ivory: #f6eedf;
+  --color-sand: #e9dcc3;
+  --color-muted: #a99a86;
+
+  --font-display: var(--font-cormorant), var(--font-tiro), "Times New Roman", serif;
+  --font-hindi: var(--font-tiro), var(--font-cormorant), serif;
+  --font-sans: var(--font-manrope), var(--font-mukta), system-ui, sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quint: cubic-bezier(0.83, 0, 0.17, 1);
+}
+
+html {
+  background: var(--color-night);
+  color: var(--color-ivory);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-sans);
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--color-saffron);
+  color: var(--color-night);
+}
+
+/* Film grain — keeps big flat dark areas from looking "digital". */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 8s steps(10) infinite;
+}
+@keyframes grain {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-6%, 4%); }
+  40% { transform: translate(4%, -8%); }
+  60% { transform: translate(-9%, 2%); }
+  80% { transform: translate(7%, 6%); }
+}
+
+.text-outline {
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--color-gold) 70%, transparent);
+  color: transparent;
+}
+
+.gold-text {
+  background: linear-gradient(100deg, #b8862f 0%, #f1d596 35%, #d4a64a 55%, #fbe7b4 70%, #a8772a 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: sheen 7s ease-in-out infinite;
+}
+@keyframes sheen {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.marquee {
+  animation: marquee var(--dur, 40s) linear infinite;
+}
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+
+.hairline {
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-gold) 55%, transparent), transparent);
+  height: 1px;
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
+
+/* Form fields used across the site */
+.field {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ivory) 22%, transparent);
+  padding: 0.9rem 0 0.7rem;
+  color: var(--color-ivory);
+  outline: none;
+  transition: border-color 0.3s;
+  font-size: 1rem;
+}
+.field:focus { border-color: var(--color-saffron); }
+.field::placeholder { color: color-mix(in srgb, var(--color-ivory) 38%, transparent); }
+select.field option { background: var(--color-night-2); }
+
+/* Admin uses a calmer light style */
+.admin-input {
+  width: 100%;
+  border: 1px solid #e3d6bf;
+  background: #fff;
+  border-radius: 10px;
+  padding: 0.6rem 0.8rem;
+  color: #1d1416;
+  font-size: 0.925rem;
+}
+.admin-input:focus { outline: 2px solid #e8820c55; border-color: #e8820c; }
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee, .gold-text, .grain::after { animation: none; }
+}
