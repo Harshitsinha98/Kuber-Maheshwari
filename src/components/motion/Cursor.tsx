@@ -23,7 +23,7 @@ export default function Cursor() {
       x.set(e.clientX);
       y.set(e.clientY);
       const el = (e.target as HTMLElement).closest<HTMLElement>("[data-cursor], a, button, [role=button], input, textarea, select");
-      setLabel(el?.dataset.cursor || null);
+      setLabel(null); // labels disabled: big text bubbles felt distracting
       setHover(Boolean(el));
     };
     window.addEventListener("pointermove", move);
