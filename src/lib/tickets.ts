@@ -108,6 +108,9 @@ export async function fulfilBooking(bookingId: string, paymentId?: string) {
         return false;
       });
     if (!ok) await prisma.booking.update({ where: { id: booking.id }, data: { emailSentAt: null } });
+    // WhatsApp alerts ride on the same "first time this booking became paid" claim, so they're sent once.
+    const { whatsappBookingAlerts } = await import("./whatsapp");
+    await whatsappBookingAlerts(booking.id).catch((e) => console.error("[whatsapp] booking alert failed", e));
   }
   return booking;
 }

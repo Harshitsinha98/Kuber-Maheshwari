@@ -2,7 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { fmtDate, rupees } from "@/lib/format";
 import { guard } from "../guard";
-import { Badge, Card, PageTitle } from "../ui";
+import { Badge, Card, PageTitle, btnGhost } from "../ui";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +30,11 @@ export default async function Bookings({ searchParams }: { searchParams: Promise
 
   return (
     <>
-      <PageTitle title="Bookings" />
+      <PageTitle title="Bookings" hi="बुकिंग">
+        <a href={`/admin/bookings/export${status ? `?status=${status}` : ""}`} className={btnGhost}>
+          Download Excel (CSV)
+        </a>
+      </PageTitle>
       <form className="mb-4 flex flex-wrap gap-2">
         <input name="q" defaultValue={q} placeholder="Search name, phone, email, ticket code" className="admin-input max-w-md" />
         <select name="status" defaultValue={status || ""} className="admin-input w-40">

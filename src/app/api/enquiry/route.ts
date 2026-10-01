@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { sendEnquiryEmails } from "@/lib/email";
+import { whatsappEnquiryAlert } from "@/lib/whatsapp";
 
 const Body = z.object({
   name: z.string().trim().min(2).max(80),
@@ -25,6 +26,6 @@ export async function POST(req: Request) {
   const { website: _hp, ...data } = p.data;
   void _hp;
   const e = await prisma.enquiry.create({ data: { ...data, email: data.email || null } });
-  await sendEnquiryEmails(e);
+  await Promise.allSettled([sendEnquiryEmails(e), whatsappEnquiryAlert(e)]);
   return NextResponse.json({ ok: true });
 }

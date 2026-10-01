@@ -78,6 +78,16 @@ Also set `NEXT_PUBLIC_INSTAGRAM_URL`, `NEXT_PUBLIC_FACEBOOK_URL`, `NEXT_PUBLIC_Y
 - "Need separate QRs?" on the ticket page shows one QR per ticket (`KM1…`) for people arriving separately. Both kinds point to the same tickets, so nothing can be used twice.
 - Saving: Save as image, Print/PDF, Share (WhatsApp), Add to calendar (.ics), installable app with **offline tickets**, and Google/Apple Wallet once configured.
 
+## WhatsApp alerts (optional)
+Official Meta **WhatsApp Cloud API**. Every confirmed booking and every enquiry sends a WhatsApp message to the numbers in `WHATSAPP_NOTIFY_TO`; optionally buyers get their ticket link (`WHATSAPP_SEND_TICKETS=on`).
+1. developers.facebook.com → app → Add product **WhatsApp** → API Setup (a free test number works immediately for up to 5 allowed recipients).
+2. Add your own sender number (it must differ from the number receiving alerts; an existing WhatsApp Business app number can be connected via coexistence).
+3. WhatsApp Manager → Message templates: create the 3 **Utility** templates in **Hindi** with the exact texts shown in Admin → WhatsApp.
+4. Business settings → System users → generate a permanent token (`whatsapp_business_messaging`, `whatsapp_business_management`).
+5. Set `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_NOTIFY_TO` in Vercel → redeploy → Admin → WhatsApp → Send test.
+
+Cost: Meta charges per delivered template message (India utility ≈ ₹0.115 + GST at the time of writing).
+
 ## Wallet passes (optional)
 The "Add to Google Wallet" / "Add to Apple Wallet" buttons appear automatically once these are set in Vercel (then redeploy).
 

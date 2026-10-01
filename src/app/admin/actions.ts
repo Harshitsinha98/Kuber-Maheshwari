@@ -303,3 +303,16 @@ export async function deleteTestimonial(id: string) {
   revalidatePath("/");
   revalidatePath("/admin/testimonials");
 }
+
+// ---------- WhatsApp ----------
+
+export async function whatsappTestAction(_prev: EmailActionState, fd: FormData): Promise<EmailActionState> {
+  await admin();
+  const kind = String(fd.get("kind") || "booking") as "booking" | "enquiry" | "ticket";
+  const to = String(fd.get("to") || "").trim() || undefined;
+  const { whatsappTest } = await import("@/lib/whatsapp");
+  const res = await whatsappTest(kind, to);
+  revalidatePath("/admin/whatsapp");
+  const bad = res.find((r) => !r.ok);
+  return bad && !bad.ok ? { error: bad.error } : { ok: `Test message sent (${res.length}). Check WhatsApp.` };
+}
