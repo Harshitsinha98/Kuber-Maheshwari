@@ -17,35 +17,35 @@ const I = {
   social: "M6 12a2.5 2.5 0 1 0 0 .01M18 6a2.5 2.5 0 1 0 0 .01M18 18a2.5 2.5 0 1 0 0 .01M8.3 11 15.7 7M8.3 13l7.4 4",
 };
 
-type Item = { href: string; label: string; hi: string; icon: keyof typeof I; admin: boolean };
+type Item = { href: string; label: string; icon: keyof typeof I; admin: boolean };
 const groups: { title: string; items: Item[] }[] = [
   {
     title: "Overview",
-    items: [{ href: "/admin", label: "Dashboard", hi: "डैशबोर्ड", icon: "home", admin: true }],
+    items: [{ href: "/admin", label: "Dashboard", icon: "home", admin: true }],
   },
   {
     title: "Events",
     items: [
-      { href: "/admin/events", label: "Events & Tickets", hi: "कार्यक्रम", icon: "events", admin: true },
-      { href: "/admin/bookings", label: "Bookings", hi: "बुकिंग", icon: "bookings", admin: true },
-      { href: "/admin/scan", label: "Scan Tickets", hi: "टिकट स्कैन", icon: "scan", admin: false },
-      { href: "/admin/enquiries", label: "Enquiries", hi: "पूछताछ", icon: "enquiries", admin: true },
+      { href: "/admin/events", label: "Events & Tickets", icon: "events", admin: true },
+      { href: "/admin/bookings", label: "Bookings", icon: "bookings", admin: true },
+      { href: "/admin/scan", label: "Scan Tickets", icon: "scan", admin: false },
+      { href: "/admin/enquiries", label: "Enquiries", icon: "enquiries", admin: true },
     ],
   },
   {
     title: "Website",
     items: [
-      { href: "/admin/gallery", label: "Gallery", hi: "गैलरी", icon: "gallery", admin: true },
-      { href: "/admin/videos", label: "Videos", hi: "वीडियो", icon: "videos", admin: true },
-      { href: "/admin/testimonials", label: "Testimonials", hi: "अनुभव", icon: "quote", admin: true },
-      { href: "/admin/social", label: "Social Feeds", hi: "सोशल", icon: "social", admin: true },
+      { href: "/admin/gallery", label: "Gallery", icon: "gallery", admin: true },
+      { href: "/admin/videos", label: "Videos", icon: "videos", admin: true },
+      { href: "/admin/testimonials", label: "Testimonials", icon: "quote", admin: true },
+      { href: "/admin/social", label: "Social Feeds", icon: "social", admin: true },
     ],
   },
   {
     title: "Notifications",
     items: [
-      { href: "/admin/whatsapp", label: "WhatsApp", hi: "व्हाट्सऐप", icon: "whatsapp", admin: true },
-      { href: "/admin/email", label: "Email", hi: "ईमेल", icon: "email", admin: true },
+      { href: "/admin/whatsapp", label: "WhatsApp", icon: "whatsapp", admin: true },
+      { href: "/admin/email", label: "Email", icon: "email", admin: true },
     ],
   },
 ];
@@ -86,9 +86,7 @@ export default function AdminNav({ role, badges = {} }: { role: string; badges?:
                       <span className="flex-1">{i.label}</span>
                       {badges[i.href] ? (
                         <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${on ? "bg-night/15" : "bg-kumkum text-ivory"}`}>{badges[i.href]}</span>
-                      ) : (
-                        <span className={`font-hindi text-xs ${on ? "text-night/60" : "text-ivory/30 group-hover:text-ivory/50"}`}>{i.hi}</span>
-                      )}
+                      ) : null}
                     </Link>
                   </li>
                 );

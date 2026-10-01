@@ -22,7 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <Link href="/admin" className="flex items-center gap-3 px-2">
           <Image src="/images/brand/km-logo.png" alt="" width={40} height={40} className="rounded-full ring-2 ring-gold/40" />
           <span className="leading-tight">
-            <span className="block font-hindi text-lg leading-snug">कुबेर माहेश्वरी</span>
+            <span className="block font-display text-xl leading-snug">Kuber Maheshwari</span>
             <span className="block text-[10px] uppercase tracking-[0.3em] text-gold">Admin panel</span>
           </span>
         </Link>
@@ -55,7 +55,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <div className="flex h-14 items-center justify-between px-4">
           <Link href="/admin" className="flex items-center gap-2">
             <Image src="/images/brand/km-logo.png" alt="" width={30} height={30} className="rounded-full" />
-            <span className="font-hindi text-base">कुबेर माहेश्वरी</span>
+            <span className="font-display text-lg">Kuber Maheshwari</span>
             <span className="rounded bg-saffron px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-night">Admin</span>
           </Link>
           <SignOutButton className="text-xs text-marigold" />

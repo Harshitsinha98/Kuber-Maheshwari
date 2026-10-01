@@ -30,7 +30,7 @@ export default async function Bookings({ searchParams }: { searchParams: Promise
 
   return (
     <>
-      <PageTitle title="Bookings" hi="बुकिंग">
+      <PageTitle title="Bookings">
         <a href={`/admin/bookings/export${status ? `?status=${status}` : ""}`} className={btnGhost}>
           Download Excel (CSV)
         </a>

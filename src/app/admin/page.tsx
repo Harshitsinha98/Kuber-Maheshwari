@@ -22,18 +22,19 @@ const startOfIstDay = (d: Date) => {
 
 function ago(d: Date, now: Date) {
   const m = Math.round((now.getTime() - d.getTime()) / 60000);
-  if (m < 1) return "abhi";
-  if (m < 60) return `${m} min pehle`;
+  if (m < 1) return "just now";
+  if (m < 60) return `${m} min ago`;
   const h = Math.round(m / 60);
-  if (h < 24) return `${h} ghante pehle`;
-  return `${Math.round(h / 24)} din pehle`;
+  if (h < 24) return `${h} hr ago`;
+  const dd = Math.round(h / 24);
+  return `${dd} day${dd > 1 ? "s" : ""} ago`;
 }
 
 function greeting(now: Date) {
   const h = new Date(now.getTime() + IST).getUTCHours();
-  if (h < 12) return "सुप्रभात";
-  if (h < 17) return "नमस्कार";
-  return "शुभ संध्या";
+  if (h < 12) return "Good morning";
+  if (h < 17) return "Good afternoon";
+  return "Good evening";
 }
 
 function Trend({ now, prev }: { now: number; prev: number }) {
@@ -116,9 +117,9 @@ export default async function Dashboard() {
   // ---- activity feed
   type Act = { at: Date; kind: "booking" | "enquiry" | "checkin"; text: string; sub: string; href: string };
   const acts: Act[] = [
-    ...recentBookings.map((b) => ({ at: b.createdAt, kind: "booking" as const, text: `${b.attendeeName} ne ${b.quantity} × ${b.ticketType.name} book kiye`, sub: `${b.event.title} · ${inr(b.amount)}`, href: `/bookings/${b.id}` })),
-    ...recentEnquiries.map((e) => ({ at: e.createdAt, kind: "enquiry" as const, text: `${e.name}: ${e.eventType} ki enquiry`, sub: [e.city, e.eventDate, e.phone].filter(Boolean).join(" · "), href: "/admin/enquiries" })),
-    ...recentCheckins.map((t) => ({ at: t.checkedInAt!, kind: "checkin" as const, text: `${t.booking.attendeeName} andar aaye`, sub: t.booking.event.title, href: "/admin/scan" })),
+    ...recentBookings.map((b) => ({ at: b.createdAt, kind: "booking" as const, text: `${b.attendeeName} booked ${b.quantity} × ${b.ticketType.name}`, sub: `${b.event.title} · ${inr(b.amount)}`, href: `/bookings/${b.id}` })),
+    ...recentEnquiries.map((e) => ({ at: e.createdAt, kind: "enquiry" as const, text: `${e.name} enquired about ${e.eventType}`, sub: [e.city, e.eventDate, e.phone].filter(Boolean).join(" · "), href: "/admin/enquiries" })),
+    ...recentCheckins.map((t) => ({ at: t.checkedInAt!, kind: "checkin" as const, text: `${t.booking.attendeeName} checked in`, sub: t.booking.event.title, href: "/admin/scan" })),
   ]
     .sort((a, b) => b.at.getTime() - a.at.getTime())
     .slice(0, 10);
@@ -155,21 +156,21 @@ export default async function Dashboard() {
         </div>
         <div className="relative flex flex-wrap items-end justify-between gap-4 pt-3">
           <div>
-            <p className="font-hindi text-lg text-gold-soft">{greeting(now)}{first ? `, ${first} जी` : ""} 🙏</p>
-            <h1 className="mt-1 font-display text-4xl md:text-5xl">Aaj ka haal</h1>
+            <p className="text-lg text-gold-soft">{greeting(now)}{first ? `, ${first} ji` : ""} 🙏</p>
+            <h1 className="mt-1 font-display text-4xl md:text-5xl">Today at a glance</h1>
             <p className="mt-2 text-sm text-ivory/70">
-              {new Intl.DateTimeFormat("hi-IN", { timeZone: "Asia/Kolkata", weekday: "long", day: "numeric", month: "long", numberingSystem: "latn" }).format(now)} ·{" "}
-              {todayTix} ticket aaj bike · {checkedToday} log aaj andar aaye · {newEnq} nayi enquiry
+              {new Intl.DateTimeFormat("en-IN", { timeZone: "Asia/Kolkata", weekday: "long", day: "numeric", month: "long" }).format(now)} ·{" "}
+              {todayTix} tickets sold today · {checkedToday} checked in today · {newEnq} new enquir{newEnq === 1 ? "y" : "ies"}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <AutoRefresh />
             <Link href="/admin/events/new" className={btn}>
-              + Naya event
+              + New event
             </Link>
             {nextEvent && (
               <Link href={`/admin/scan?event=${nextEvent.id}`} className="inline-flex items-center rounded-full border border-ivory/25 px-4 py-2.5 text-sm hover:border-gold hover:text-gold">
-                Ticket scan karein
+                Scan tickets
               </Link>
             )}
           </div>
@@ -178,10 +179,10 @@ export default async function Dashboard() {
 
       {/* ---------- KPIs ---------- */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <K label="Kamai · 7 din" value={inr(rev7)} sub={`Kul kamai ${inr(allTime._sum.amount || 0)}`} trend={<Trend now={rev7} prev={revPrev} />} icon="M12 3v18M17 7H9.5a3 3 0 0 0 0 6h5a3 3 0 0 1 0 6H6" />
-        <K label="Ticket · 7 din" value={tix7} sub={`Kul ${allTime._sum.quantity || 0} ticket · ${allTime._count} booking`} trend={<Trend now={tix7} prev={tixPrev} />} icon="M4 7h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4zM9 7v12" tone="maroon" />
-        <K label="Aaj andar aaye" value={checkedToday} sub="Gate par scan hue ticket" icon="M5 12.5l4.5 4.5L19 7.5" tone="green" />
-        <K label="Nayi enquiry" value={newEnq} sub={newEnq ? "Jawab dena baaki" : "Sab ka jawab ho gaya"} icon="M4 5h16v11H8l-4 4z" tone="sky" />
+        <K label="Revenue · 7 days" value={inr(rev7)} sub={`All time ${inr(allTime._sum.amount || 0)}`} trend={<Trend now={rev7} prev={revPrev} />} icon="M6 4h12M6 9h12M10 4c4 0 6 2 6 5s-2 5-6 5H7l8 7" />
+        <K label="Tickets · 7 days" value={tix7} sub={`All time ${allTime._sum.quantity || 0} tickets · ${allTime._count} bookings`} trend={<Trend now={tix7} prev={tixPrev} />} icon="M4 7h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4zM9 7v12" tone="maroon" />
+        <K label="Checked in today" value={checkedToday} sub="Tickets scanned at the gate" icon="M5 12.5l4.5 4.5L19 7.5" tone="green" />
+        <K label="New enquiries" value={newEnq} sub={newEnq ? "Awaiting your reply" : "All caught up"} icon="M4 5h16v11H8l-4 4z" tone="sky" />
       </div>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[1.6fr_1fr]">
@@ -189,12 +190,12 @@ export default async function Dashboard() {
         <Card>
           <div className="flex flex-wrap items-end justify-between gap-2">
             <div>
-              <h2 className="font-semibold">Pichle 30 din ki bikri</h2>
+              <h2 className="font-semibold">Sales · last 30 days</h2>
               <p className="text-sm text-ink/55">
-                {qty30} ticket · {inr(total30)}
+                {qty30} tickets · {inr(total30)}
               </p>
             </div>
-            <span className="text-xs text-ink/45">Har bar = ek din (tickets)</span>
+            <span className="text-xs text-ink/45">Each bar = one day (tickets)</span>
           </div>
           <div className="mt-5 flex h-44 items-end gap-[3px]" role="img" aria-label="Tickets sold per day, last 30 days">
             {series.map((x, i) => (
@@ -204,14 +205,14 @@ export default async function Dashboard() {
                   style={{ height: `${x.qty ? Math.max(6, (x.qty / maxQty) * 100) : 3}%` }}
                 />
                 <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-lg bg-ink px-2.5 py-1.5 text-[11px] text-ivory group-hover:block">
-                  {new Date(x.d).toLocaleDateString("en-IN", { day: "numeric", month: "short" })} · {x.qty} ticket · {inr(x.amount)}
+                  {new Date(x.d).toLocaleDateString("en-IN", { day: "numeric", month: "short" })} · {x.qty} tickets · {inr(x.amount)}
                 </div>
               </div>
             ))}
           </div>
           <div className="mt-2 flex justify-between text-[11px] text-ink/45">
             <span>{new Date(days[0]).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</span>
-            <span>Aaj</span>
+            <span>Today</span>
           </div>
         </Card>
 
@@ -244,16 +245,16 @@ export default async function Dashboard() {
         {/* ---------- events ---------- */}
         <Card>
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold">Aane wale kaaryakram</h2>
+            <h2 className="font-semibold">Upcoming events</h2>
             <Link href="/admin/events" className="text-sm text-kumkum hover:underline">
-              Sab dekhein
+              View all
             </Link>
           </div>
           {events.length === 0 ? (
             <div className="mt-6 rounded-2xl bg-[#faf4e8] p-6 text-center">
-              <p className="text-sm text-ink/60">Abhi koi event nahi hai.</p>
+              <p className="text-sm text-ink/60">No upcoming events yet.</p>
               <Link href="/admin/events/new" className={`${btn} mt-4`}>
-                Pehla event banayein
+                Create your first event
               </Link>
             </div>
           ) : (
@@ -273,7 +274,7 @@ export default async function Dashboard() {
                         {e.status === "DRAFT" && <span className="ml-2 rounded bg-stone-200 px-1.5 py-0.5 text-[10px] uppercase">Draft</span>}
                       </Link>
                       <span className={`rounded-full px-2.5 py-0.5 text-xs ${daysLeft <= 2 ? "bg-kumkum text-ivory" : "bg-[#f3ead8] text-ink/70"}`}>
-                        {fmtDate(e.startsAt)} · {daysLeft <= 0 ? "aaj" : `${daysLeft} din baaki`}
+                        {fmtDate(e.startsAt)} · {daysLeft <= 0 ? "today" : `in ${daysLeft} day${daysLeft > 1 ? "s" : ""}`}
                       </span>
                     </div>
                     <div className="mt-2 flex items-center gap-3">
@@ -289,7 +290,7 @@ export default async function Dashboard() {
                         Scan
                       </Link>
                       <a href={`https://wa.me/?text=${encodeURIComponent(`🙏 ${e.title}\n${fmtDate(e.startsAt)} · ${e.venueName}, ${e.city}\nटिकट: ${url}`)}`} target="_blank" rel="noopener" className={btnGhost}>
-                        WhatsApp par share
+                        Share on WhatsApp
                       </a>
                       <CopyLink url={url} />
                       <a href={`/admin/events/${e.id}/export`} className={btnGhost}>
@@ -305,9 +306,9 @@ export default async function Dashboard() {
 
         {/* ---------- activity ---------- */}
         <Card>
-          <h2 className="font-semibold">Taaza gatividhi</h2>
+          <h2 className="font-semibold">Recent activity</h2>
           {acts.length === 0 ? (
-            <p className="mt-4 text-sm text-ink/55">Abhi koi booking ya enquiry nahi aayi. Jaise hi aayegi, yahan dikhegi.</p>
+            <p className="mt-4 text-sm text-ink/55">No bookings or enquiries yet. They will appear here as they come in.</p>
           ) : (
             <ul className="mt-4 space-y-3">
               {acts.map((a, i) => (

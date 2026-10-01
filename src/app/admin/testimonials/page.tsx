@@ -13,7 +13,7 @@ export default async function AdminTestimonials() {
     <>
       <PageTitle title="Testimonials" />
       <p className="-mt-3 mb-5 text-sm text-ink/60">
-        Words from organisers and devotees. They appear on the Home page as &quot;भक्तों के अनुभव&quot;. The section stays hidden until you add the first one. Only add real messages, with
+        Words from organisers and devotees. They appear on the Home page in the testimonials section. The section stays hidden until you add the first one. Only add real messages, with
         permission.
       </p>
       <Card className="mb-6">
