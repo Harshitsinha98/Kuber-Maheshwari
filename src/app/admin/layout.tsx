@@ -20,7 +20,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </Link>
           <div className="flex items-center gap-4 text-sm">
             <Link href="/" className="hidden text-ink/60 hover:text-ink sm:block">
-              View site ↗
+              View site
             </Link>
             <span className="hidden text-ink/50 md:block">{s.user.email}</span>
             <SignOutButton className="text-sm text-kumkum" />

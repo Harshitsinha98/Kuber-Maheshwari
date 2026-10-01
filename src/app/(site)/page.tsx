@@ -10,6 +10,7 @@ import LiveVideo from "@/components/home/LiveVideo";
 import EventShowcase from "@/components/events/EventShowcase";
 import { ArrowIcon } from "@/components/site/Icons";
 import SocialFeed from "@/components/social/SocialFeed";
+import Testimonials from "@/components/home/Testimonials";
 import { Reveal } from "@/components/motion/Reveal";
 import { getUpcomingEvents } from "@/lib/queries";
 
@@ -29,6 +30,7 @@ export default async function Home() {
       <UpcomingEvents events={events} />
       <SundarkandFeature />
       <Legends />
+      <Testimonials />
       <GalleryColumns />
       <LiveVideo />
       <SocialFeed />

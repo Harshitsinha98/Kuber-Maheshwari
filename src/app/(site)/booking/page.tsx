@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import EnquiryForm from "@/components/site/EnquiryForm";
+import Faq from "@/components/site/Faq";
+import { bookingFaqs } from "@/lib/faqs";
 import { Reveal, SplitText } from "@/components/motion/Reveal";
 import { ArrowIcon, WhatsappIcon } from "@/components/site/Icons";
 import { site, waLink } from "@/lib/site";
@@ -167,6 +169,7 @@ export default async function Booking({ searchParams }: { searchParams: Promise<
           </Reveal>
         </div>
       </section>
+      <Faq title="आयोजन बुकिंग से जुड़े सवाल" items={bookingFaqs} />
     </>
   );
 }

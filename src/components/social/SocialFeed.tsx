@@ -17,9 +17,8 @@ export default async function SocialFeed({ limit = 8 }: { limit?: number }) {
       <div className="mb-14 flex flex-col justify-between gap-6 md:flex-row md:items-end">
         <div>
           <p className="text-xs uppercase tracking-[0.35em] text-gold"><Tracked text="(07) Social · हर दिन नया" /></p>
-          <h2 className="mt-4 font-display text-5xl leading-none md:text-7xl">
-            Latest from <span className="italic text-gold">Instagram & Facebook</span>
-          </h2>
+          <h2 className="mt-3 font-hindi text-5xl leading-[1.35] md:text-7xl">सोशल मीडिया से ताज़ा</h2>
+            <p className="mt-1 font-display text-2xl italic text-gold/80 md:text-3xl">Latest from Instagram &amp; Facebook</p>
         </div>
         <div className="flex gap-3">
           <FollowButton href={site.social.instagram} label="Instagram" profile={ig.profile} icon="ig" />

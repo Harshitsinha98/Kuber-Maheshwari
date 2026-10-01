@@ -21,7 +21,7 @@ const jsonLd = {
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div>
+    <div className="pb-[76px] md:pb-0 print:pb-0">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <SmoothScroll />
       <Cursor />

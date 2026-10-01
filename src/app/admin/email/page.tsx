@@ -53,10 +53,10 @@ export default async function AdminEmail() {
             <p className="font-semibold">To switch email on:</p>
             <ol className="mt-2 list-decimal space-y-1 pl-5">
               <li>
-                Sign up at <b>resend.com</b> → <b>API Keys</b> → <b>Create API Key</b> (permission: Sending access).
+                Sign up at <b>resend.com</b> <b>API Keys</b> <b>Create API Key</b> (permission: Sending access).
               </li>
               <li>
-                Vercel → Settings → Environment Variables → add <code>RESEND_API_KEY</code> → <b>Redeploy</b>.
+                Vercel Settings Environment Variables add <code>RESEND_API_KEY</code> <b>Redeploy</b>.
               </li>
               <li>Come back here and click <b>Send test email</b>.</li>
             </ol>
@@ -70,7 +70,7 @@ export default async function AdminEmail() {
               can always see and show their QR tickets under <b>My Tickets</b> on the website.
             </p>
             <p className="mt-2">
-              When the domain is ready: Resend → <b>Domains</b> → add it and the DNS records → after it shows <i>Verified</i>, set{" "}
+              When the domain is ready: Resend <b>Domains</b> add it and the DNS records after it shows <i>Verified</i>, set{" "}
               <code>EMAIL_FROM=&quot;Kuber Maheshwari &lt;tickets@your-domain.com&gt;&quot;</code> in Vercel and redeploy.
             </p>
           </div>
@@ -78,7 +78,7 @@ export default async function AdminEmail() {
 
         <div className="mt-5 grid gap-3 text-xs text-ink/60 md:grid-cols-2">
           <p>
-            Last sent: {activity.lastOk ? `${when(activity.lastOk.at)} · “${activity.lastOk.subject}” → ${[activity.lastOk.to].flat().join(", ")}` : "never"}
+            Last sent: {activity.lastOk ? `${when(activity.lastOk.at)} · “${activity.lastOk.subject}” ${[activity.lastOk.to].flat().join(", ")}` : "never"}
           </p>
           {activity.lastError && (
             <p className="text-red-700">

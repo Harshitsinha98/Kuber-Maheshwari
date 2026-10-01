@@ -14,7 +14,7 @@ export default async function Gallery() {
   const images = await getGallery();
   return (
     <>
-      <PageHeader kicker="झलकियाँ · Gallery" title="Moments" italic="of devotion." />
+      <PageHeader kicker="झलकियाँ · Gallery" hi="भक्ति के पल" title="Moments" italic="of devotion." />
       <section className="px-3 pb-32 md:px-6">
         <GalleryGrid images={images} />
       </section>

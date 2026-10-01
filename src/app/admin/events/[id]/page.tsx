@@ -33,7 +33,7 @@ export default async function EditEvent({ params, searchParams }: { params: Prom
     <>
       <PageTitle title={e.title}>
         <Link href={`/events/${e.slug}`} target="_blank" className={btnGhost}>
-          View page ↗
+          View page
         </Link>
         <Link href={`/admin/scan?event=${e.id}`} className={btnGhost}>
           Scan for this event
@@ -50,7 +50,7 @@ export default async function EditEvent({ params, searchParams }: { params: Prom
       )}
       {e.status === "DRAFT" && (
         <p className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
-          <b>This event is a Draft and is hidden from the website.</b> To show it, change <b>Status → Published</b> below and click Save changes.
+          <b>This event is a Draft and is hidden from the website.</b> To show it, change <b>Status Published</b> below and click Save changes.
         </p>
       )}
       {e.status === "PUBLISHED" && e.startsAt.getTime() < Date.now() - 6 * 3600e3 && (

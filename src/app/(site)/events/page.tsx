@@ -3,6 +3,8 @@ import Link from "next/link";
 import PageHeader from "@/components/site/PageHeader";
 import EventList from "@/components/events/EventList";
 import EventShowcase from "@/components/events/EventShowcase";
+import Faq from "@/components/site/Faq";
+import { ticketFaqs } from "@/lib/faqs";
 import { Reveal } from "@/components/motion/Reveal";
 import { getPastEvents, getUpcomingEvents } from "@/lib/queries";
 
@@ -19,6 +21,7 @@ export default async function Events() {
     <>
       <PageHeader
         kicker="कार्यक्रम · Events"
+        hi="आइए, साथ में गाएँ"
         title="Come, sing"
         italic="along."
         intro="Book online with your Google account. Your QR e-ticket arrives by email instantly and is scanned at the gate."
@@ -47,6 +50,7 @@ export default async function Events() {
           </div>
         )}
       </section>
+      <Faq title="टिकट से जुड़े सवाल" items={ticketFaqs} />
     </>
   );
 }

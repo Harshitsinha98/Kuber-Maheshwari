@@ -273,3 +273,33 @@ export async function refreshSocialNow() {
   revalidatePath("/");
   return r;
 }
+
+// ---------- Testimonials ----------
+
+const TestimonialIn = z.object({
+  name: z.string().trim().min(2, "Name is required").max(60),
+  place: z.string().trim().max(60).optional(),
+  occasion: z.string().trim().max(60).optional(),
+  text: z.string().trim().min(10, "Write at least a sentence").max(600),
+});
+
+export async function addTestimonial(_prev: FormState, fd: FormData): Promise<FormState> {
+  await admin();
+  const p = TestimonialIn.safeParse(Object.fromEntries(fd));
+  if (!p.success) return { error: p.error.issues[0]?.message };
+  const { getTestimonials, saveTestimonials } = await import("@/lib/testimonials");
+  const list = await getTestimonials();
+  list.unshift({ id: Date.now().toString(36), ...p.data, place: p.data.place || undefined, occasion: p.data.occasion || undefined, createdAt: new Date().toISOString() });
+  await saveTestimonials(list);
+  revalidatePath("/");
+  revalidatePath("/admin/testimonials");
+  return {};
+}
+
+export async function deleteTestimonial(id: string) {
+  await admin();
+  const { getTestimonials, saveTestimonials } = await import("@/lib/testimonials");
+  await saveTestimonials((await getTestimonials()).filter((t) => t.id !== id));
+  revalidatePath("/");
+  revalidatePath("/admin/testimonials");
+}

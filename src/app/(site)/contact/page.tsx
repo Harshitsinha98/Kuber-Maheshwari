@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function Contact() {
   return (
     <>
-      <PageHeader kicker="संपर्क · Contact" title="Let's talk" italic="bhakti." />
+      <PageHeader kicker="संपर्क · Contact" hi="आइए, बात करें" title="Let's talk" italic="bhakti." />
       <section className="mx-auto max-w-[1500px] px-5 md:px-10">
         <div className="grid gap-px bg-ivory/10 md:grid-cols-3">
           {site.phones.map((p, i) => (

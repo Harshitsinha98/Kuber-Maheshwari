@@ -2,12 +2,15 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getEvent, seatsLeftForEvent } from "@/lib/queries";
-import { fmtDate, fmtTime } from "@/lib/format";
+import { fmtDate, fmtDateHi, fmtTime, fmtTimeHi, rupees } from "@/lib/format";
 import { razorpayEnabled, razorpayTestMode } from "@/lib/razorpay";
 import { site } from "@/lib/site";
 import { getSession } from "@/lib/auth";
 import { Reveal, SplitText } from "@/components/motion/Reveal";
 import TicketPicker from "@/components/events/TicketPicker";
+import { Countdown } from "@/components/events/EventShowcase";
+import EventShare from "@/components/events/EventShare";
+import MobileBookBar from "@/components/events/MobileBookBar";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +22,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${e.title}, ${e.city} · ${fmtDate(e.startsAt)}`,
     description: e.subtitle || e.description.slice(0, 160),
-    openGraph: { images: e.posterUrl ? [e.posterUrl] : ["/images/gallery/kuber-25.webp"] },
   };
 }
 
@@ -39,6 +41,10 @@ export default async function EventPage({ params }: Props) {
     remaining: left.get(t.id) ?? 0,
   }));
   const place = `${e.venueName}, ${e.address}, ${e.city}`;
+  const seatsLeft = types.reduce((a, t) => a + t.remaining, 0);
+  const capacity = e.ticketTypes.reduce((a, t) => a + t.capacity, 0);
+  const paid = types.map((t) => t.price).filter((x) => x > 0);
+  const fromPrice = types.length ? (paid.length ? Math.min(...paid) : 0) : null;
   const mapQ = encodeURIComponent(place);
   const past = e.startsAt.getTime() < Date.now() - 6 * 3600e3;
   const gcal = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(e.title)}&dates=${iso(e.startsAt)}/${iso(
@@ -63,10 +69,31 @@ export default async function EventPage({ params }: Props) {
       <div className="relative h-[78vh] min-h-[520px] overflow-hidden">
         <Image src={e.posterUrl || "/images/gallery/kuber-25.webp"} alt={e.title} fill priority quality={90} sizes="100vw" className="object-cover object-[50%_30%]" />
         <div className="absolute inset-0 bg-gradient-to-t from-night via-night/60 to-night/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#3a0b12]/70 to-transparent" />
+        <div className="toran absolute inset-x-0 top-20 z-10 md:top-24" aria-hidden />
         <div className="absolute inset-x-0 bottom-0 mx-auto max-w-[1500px] px-5 pb-14 md:px-10">
-          <p className="text-xs uppercase tracking-[0.35em] text-saffron">{e.category}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full border border-gold/50 px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-soft">{e.category}</span>
+            {!past && e.status === "PUBLISHED" && capacity > 0 && (
+              <span
+                className={`rounded-full px-3.5 py-1 font-hindi text-sm font-semibold ${
+                  seatsLeft === 0 ? "bg-kumkum text-ivory" : seatsLeft <= Math.max(20, capacity * 0.2) ? "animate-pulse bg-kumkum text-ivory" : "bg-[#1f9d55] text-white"
+                }`}
+              >
+                {seatsLeft === 0 ? "हाउसफुल" : seatsLeft <= Math.max(20, capacity * 0.2) ? `सिर्फ़ ${seatsLeft} सीटें बाकी` : "टिकट बुकिंग शुरू"}
+              </span>
+            )}
+          </div>
           <SplitText as="h1" immediate text={e.title} className="mt-4 block max-w-5xl font-display text-5xl leading-[0.95] text-ivory md:text-8xl" />
           {e.subtitle && <p className="mt-4 max-w-2xl text-lg text-ivory/75">{e.subtitle}</p>}
+          <p className="mt-4 font-hindi text-xl text-ivory/90">
+            {fmtDateHi(e.startsAt)} · {fmtTimeHi(e.startsAt)} · {e.venueName}, {e.city}
+          </p>
+          {!past && e.status === "PUBLISHED" && (
+            <div className="mt-6">
+              <Countdown iso={e.startsAt.toISOString()} />
+            </div>
+          )}
           {draft && (
             <p className="mt-6 inline-block rounded-full bg-marigold px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-night">
               Draft preview · only admins can see this. Set status to Published to show it on the website.
@@ -81,21 +108,20 @@ export default async function EventPage({ params }: Props) {
       <div className="mx-auto grid max-w-[1500px] gap-16 px-5 py-20 md:px-10 lg:grid-cols-[1fr_460px]">
         <div>
           <Reveal>
-            <dl className="grid gap-8 border-y border-ivory/10 py-10 sm:grid-cols-3">
-              <div>
-                <dt className="text-[11px] uppercase tracking-[0.3em] text-muted">Date</dt>
-                <dd className="mt-2 font-display text-2xl">{fmtDate(e.startsAt)}</dd>
+            <dl className="grid gap-4 sm:grid-cols-3">
+              <div className="rounded-3xl border border-gold/20 bg-gradient-to-br from-[#241014] to-night p-6">
+                <dt className="font-hindi text-sm text-saffron">तारीख़</dt>
+                <dd className="mt-2 font-hindi text-xl leading-snug text-ivory">{fmtDateHi(e.startsAt)}</dd>
+                <dd className="text-sm text-muted">{fmtDate(e.startsAt)}</dd>
               </div>
-              <div>
-                <dt className="text-[11px] uppercase tracking-[0.3em] text-muted">Time</dt>
-                <dd className="mt-2 font-display text-2xl">
-                  {fmtTime(e.startsAt)}
-                  {e.gatesOpenAt && <span className="block text-sm text-muted">Gates open {fmtTime(e.gatesOpenAt)}</span>}
-                </dd>
+              <div className="rounded-3xl border border-gold/20 bg-gradient-to-br from-[#241014] to-night p-6">
+                <dt className="font-hindi text-sm text-saffron">समय</dt>
+                <dd className="mt-2 font-display text-2xl text-ivory">{fmtTime(e.startsAt)}</dd>
+                {e.gatesOpenAt && <dd className="font-hindi text-sm text-muted">प्रवेश {fmtTimeHi(e.gatesOpenAt)} से</dd>}
               </div>
-              <div>
-                <dt className="text-[11px] uppercase tracking-[0.3em] text-muted">Venue</dt>
-                <dd className="mt-2 font-display text-2xl">{e.venueName}</dd>
+              <div className="rounded-3xl border border-gold/20 bg-gradient-to-br from-[#241014] to-night p-6">
+                <dt className="font-hindi text-sm text-saffron">स्थान</dt>
+                <dd className="mt-2 font-display text-2xl leading-tight text-ivory">{e.venueName}</dd>
                 <dd className="text-sm text-muted">
                   {e.address}, {e.city}
                 </dd>
@@ -105,20 +131,21 @@ export default async function EventPage({ params }: Props) {
           <Reveal>
             <div className="mt-12 whitespace-pre-line text-lg leading-relaxed text-ivory/75">{e.description}</div>
           </Reveal>
-          <div className="mt-10 flex flex-wrap gap-3 text-xs uppercase tracking-[0.18em]">
-            <a href={e.mapUrl || `https://www.google.com/maps/search/?api=1&query=${mapQ}`} target="_blank" rel="noopener" className="rounded-full border border-ivory/20 px-5 py-3 hover:border-gold hover:text-gold">
-              Get directions
+          <div className="mt-10 flex flex-wrap gap-3">
+            <a href={e.mapUrl || `https://www.google.com/maps/search/?api=1&query=${mapQ}`} target="_blank" rel="noopener" className="rounded-full border border-ivory/20 px-5 py-3 font-hindi text-base hover:border-gold hover:text-gold">
+              रास्ता देखें
             </a>
-            <a href={gcal} target="_blank" rel="noopener" className="rounded-full border border-ivory/20 px-5 py-3 hover:border-gold hover:text-gold">
-              Add to calendar
+            <a href={gcal} target="_blank" rel="noopener" className="rounded-full border border-ivory/20 px-5 py-3 font-hindi text-base hover:border-gold hover:text-gold">
+              कैलेंडर में जोड़ें
             </a>
+            <EventShare title={e.title} line={`${fmtDateHi(e.startsAt)} · ${fmtTimeHi(e.startsAt)} · ${e.venueName}, ${e.city}`} url={`${site.url}/events/${e.slug}`} />
           </div>
           <div className="mt-12 aspect-[16/9] overflow-hidden border border-ivory/10 grayscale-[60%] invert-[0.9] hue-rotate-180">
             <iframe title="Venue map" src={`https://www.google.com/maps?q=${mapQ}&output=embed`} className="h-full w-full" loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
           </div>
         </div>
 
-        <aside className="lg:sticky lg:top-28 lg:self-start">
+        <aside id="tickets" className="scroll-mt-28 lg:sticky lg:top-28 lg:self-start">
           <TicketPicker
             event={{ id: e.id, slug: e.slug, title: e.title }}
             types={types}
@@ -129,6 +156,11 @@ export default async function EventPage({ params }: Props) {
           />
         </aside>
       </div>
+      <MobileBookBar
+        price={fromPrice === null ? null : fromPrice === 0 ? "निःशुल्क" : rupees(fromPrice)}
+        label={draft ? "प्रकाशित नहीं" : e.status === "CANCELLED" ? "कार्यक्रम रद्द" : past ? "कार्यक्रम समाप्त" : "हाउसफुल"}
+        disabled={draft || e.status === "CANCELLED" || past || seatsLeft === 0}
+      />
     </article>
   );
 }

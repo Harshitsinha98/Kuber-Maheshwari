@@ -29,9 +29,8 @@ export default function ServicesScroll() {
         <div className="mx-auto mb-10 flex w-full max-w-[1500px] items-end justify-between px-5 md:px-10">
           <div>
             <p className="text-xs uppercase tracking-[0.35em] text-kumkum"><Tracked text="(02) सेवाएँ" /></p>
-            <h2 className="mt-4 font-display text-5xl leading-none md:text-7xl">
-              Every occasion, <span className="italic text-maroon">its own bhaav.</span>
-            </h2>
+            <h2 className="mt-3 font-hindi text-5xl leading-[1.35] md:text-7xl">हर अवसर, अपना भाव</h2>
+            <p className="mt-1 font-display text-2xl italic text-maroon md:text-3xl">Every occasion, its own bhaav.</p>
           </div>
           <Link href="/services" className="hidden text-sm uppercase tracking-[0.2em] text-maroon underline-offset-8 hover:underline md:block">
             All services →

@@ -15,6 +15,7 @@ export default function Services() {
     <>
       <PageHeader
         kicker="सेवाएँ · Services"
+        hi="हर पावन अवसर का संगीत"
         title="Music for every"
         italic="sacred moment."
         intro="From an intimate Sundarkand at home to a festival stage with thousands singing along, every performance is prepared for its occasion."

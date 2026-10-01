@@ -17,7 +17,7 @@ export default async function Videos() {
   const videos = await getVideos();
   return (
     <>
-      <PageHeader kicker="वीडियो · Videos" title="Watch," italic="and sing along." />
+      <PageHeader kicker="वीडियो · Videos" hi="देखिए, और साथ में गाइए" title="Watch," italic="and sing along." />
       <LiveVideo />
       {videos.length > 0 && (
         <section className="mx-auto grid max-w-[1500px] gap-6 px-5 py-20 md:grid-cols-2 md:px-10">

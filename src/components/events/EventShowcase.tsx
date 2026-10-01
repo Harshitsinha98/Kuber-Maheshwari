@@ -36,7 +36,7 @@ function useCountdown(iso: string) {
   return left;
 }
 
-function Countdown({ iso }: { iso: string }) {
+export function Countdown({ iso }: { iso: string }) {
   const left = useCountdown(iso);
   if (left === null) return <div className="h-[86px]" />;
   if (left === 0)

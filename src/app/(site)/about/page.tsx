@@ -16,6 +16,7 @@ export default function About() {
     <>
       <PageHeader
         kicker="परिचय · About"
+        hi="भक्ति में रमा जीवन"
         title="A life tuned"
         italic="to bhakti."
         intro="Born in Indore, a B.Com graduate by education and a musician by calling. Kuber Maheshwari's music grew out of the kirtans he attended with his father, and was refined on stages all across India."

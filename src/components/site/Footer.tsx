@@ -11,11 +11,10 @@ export default function Footer() {
         <div className="grid gap-16 lg:grid-cols-[1.4fr_1fr]">
           <div>
             <p className="text-xs uppercase tracking-[0.35em] text-gold"><Tracked text="अपने आयोजन को भक्तिमय बनाइए" /></p>
-            <h2 className="mt-6 font-display text-5xl leading-[0.95] text-ivory md:text-7xl">
-              Let&apos;s create an evening
-              <br />
-              <span className="italic text-gold">they&apos;ll remember.</span>
+            <h2 className="mt-5 font-hindi text-5xl leading-[1.35] text-ivory md:text-7xl">
+              एक शाम, जो <span className="gold-text">याद रहे</span>
             </h2>
+            <p className="mt-2 font-display text-2xl italic text-gold/80 md:text-3xl">Let&apos;s create an evening they&apos;ll remember.</p>
             <div className="mt-10 flex flex-wrap gap-4">
               <Magnetic>
                 <Link

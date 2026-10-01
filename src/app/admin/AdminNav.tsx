@@ -11,6 +11,7 @@ const items = [
   { href: "/admin/enquiries", label: "Enquiries", admin: true },
   { href: "/admin/gallery", label: "Gallery", admin: true },
   { href: "/admin/videos", label: "Videos", admin: true },
+  { href: "/admin/testimonials", label: "Testimonials", admin: true },
   { href: "/admin/email", label: "Email", admin: true },
   { href: "/admin/social", label: "Social Feeds", admin: true },
 ];

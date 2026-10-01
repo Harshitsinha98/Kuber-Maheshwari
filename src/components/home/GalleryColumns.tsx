@@ -28,9 +28,8 @@ export default function GalleryColumns() {
       <div className="mx-auto mb-16 flex max-w-[1500px] items-end justify-between px-5 md:px-10">
         <div>
           <p className="text-xs uppercase tracking-[0.35em] text-gold"><Tracked text="(05) झलकियाँ" /></p>
-          <h2 className="mt-4 font-display text-5xl leading-none md:text-7xl">
-            Moments of <span className="italic text-gold">devotion</span>
-          </h2>
+          <h2 className="mt-3 font-hindi text-5xl leading-[1.35] md:text-7xl">भक्ति के पल</h2>
+            <p className="mt-1 font-display text-2xl italic text-gold/80 md:text-3xl">Moments of devotion</p>
         </div>
         <Link href="/gallery" className="text-sm uppercase tracking-[0.2em] text-gold underline-offset-8 hover:underline">
           Full gallery →
