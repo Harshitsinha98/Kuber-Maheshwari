@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { fmtTime, inr, rupees, toLocalIST } from "@/lib/format";
 import { remainingSeats } from "@/lib/tickets";
+import { razorpayEnabled } from "@/lib/razorpay";
 import { guard } from "../../guard";
 import { Badge, Card, PageTitle, btnGhost } from "../../ui";
 import EventForm from "../EventForm";
@@ -42,6 +43,11 @@ export default async function EditEvent({ params, searchParams }: { params: Prom
         </a>
       </PageTitle>
       {saved && <p className="mb-4 rounded-lg bg-green-50 p-3 text-sm text-green-800">Saved ✓</p>}
+      {!razorpayEnabled() && e.ticketTypes.some((t) => t.price > 0) && (
+        <p className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+          <b>Online payment is not connected yet (Razorpay keys missing).</b> Paid tickets currently show a &quot;Book on WhatsApp&quot; button instead of online payment. Free tickets (₹0) can still be booked online. Add <code>RAZORPAY_KEY_ID</code>, <code>RAZORPAY_KEY_SECRET</code> and <code>RAZORPAY_WEBHOOK_SECRET</code> in Vercel and redeploy to enable payments.
+        </p>
+      )}
       {e.status === "DRAFT" && (
         <p className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
           <b>This event is a Draft and is hidden from the website.</b> To show it, change <b>Status → Published</b> below and click Save changes.

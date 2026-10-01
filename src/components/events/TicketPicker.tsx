@@ -5,6 +5,8 @@ import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { rupees } from "@/lib/format";
+import { waLink } from "@/lib/site";
+import { WhatsappIcon } from "@/components/site/Icons";
 
 type TT = { id: string; name: string; description: string | null; price: number; maxPerOrder: number; remaining: number };
 
@@ -182,17 +184,29 @@ export default function TicketPicker({
 
       {err && <p className="mt-4 text-sm text-marigold">{err}</p>}
 
+      {paidButNoGateway && !disabled && t ? (
+        <>
+          <a
+            href={waLink(`नमस्ते, मुझे "${event.title}" के लिए ${qty} × ${t.name} टिकट (${rupees(total)}) बुक करने हैं।`)}
+            target="_blank"
+            rel="noopener"
+            className="mt-6 flex h-14 w-full items-center justify-center gap-3 rounded-full bg-[#1f9d55] text-sm font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:bg-[#18864a]"
+          >
+            <WhatsappIcon className="h-5 w-5" /> Book {qty} on WhatsApp
+          </a>
+          <p className="mt-4 text-center text-[11px] text-muted">Online payment is starting soon. For now, book directly with our team on WhatsApp.</p>
+        </>
+      ) : (
+      <>
       <button
         type="button"
         onClick={book}
-        disabled={!t || busy || disabled || status === "loading" || paidButNoGateway}
+        disabled={!t || busy || disabled || status === "loading"}
         className="mt-6 flex h-14 w-full items-center justify-center rounded-full bg-saffron text-sm font-semibold uppercase tracking-[0.18em] text-night transition-colors hover:bg-marigold disabled:cursor-not-allowed disabled:bg-ivory/15 disabled:text-ivory/40"
       >
         {disabled
           ? disabledReason
-          : paidButNoGateway
-            ? "Online booking opening soon"
-            : busy
+          : busy
               ? "Please wait…"
               : !session
                 ? "Sign in with Google to book"
@@ -200,7 +214,11 @@ export default function TicketPicker({
                   ? "Reserve free pass"
                   : `Pay ${rupees(total)}`}
       </button>
-      <p className="mt-4 text-center text-[11px] text-muted">Secure payment via UPI / Cards / Netbanking · Instant QR e-ticket</p>
+      <p className="mt-4 text-center text-[11px] text-muted">
+        {t?.price === 0 ? "Free pass · Instant QR e-ticket" : "Secure payment via UPI / Cards / Netbanking · Instant QR e-ticket"}
+      </p>
+      </>
+      )}
     </div>
   );
 }

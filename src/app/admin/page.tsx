@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { fmtDate, inr } from "@/lib/format";
 import { guard } from "./guard";
+import { razorpayEnabled } from "@/lib/razorpay";
 import { Card, PageTitle, btn } from "./ui";
 
 export const dynamic = "force-dynamic";
@@ -38,6 +39,11 @@ export default async function Dashboard() {
           + New event
         </Link>
       </PageTitle>
+      {!razorpayEnabled() && (
+        <p className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+          <b>Online payments are off</b>: Razorpay is not connected. Paid tickets show a WhatsApp booking button; free passes work normally.
+        </p>
+      )}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
         {stats.map(([k, v]) => (
           <Card key={k as string}>

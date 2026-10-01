@@ -34,6 +34,8 @@ export default function Hero() {
   const overlay = useTransform(scrollYProgress, (v) => 0.55 * ramp(v, 0.5, 0.9));
   const endText = useTransform(scrollYProgress, (v) => ramp(v, 0.7, 0.9));
   const endY = useTransform(scrollYProgress, (v) => 40 * (1 - ramp(v, 0.7, 0.95)));
+  // Invisible buttons must not catch clicks/taps.
+  const endPointer = useTransform(scrollYProgress, (v) => (ramp(v, 0.7, 0.9) > 0.6 ? "auto" : "none"));
 
   return (
     <section ref={ref} className="relative h-[220vh] bg-night">
@@ -65,7 +67,7 @@ export default function Hero() {
           </motion.p>
         </motion.div>
 
-        <div className="absolute inset-x-0 bottom-[13svh] top-[18.5svh] z-10 flex flex-col justify-between px-4 md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:flex-row md:items-center md:px-8">
+        <div className="pointer-events-none absolute inset-x-0 bottom-[13svh] top-[18.5svh] z-10 flex flex-col justify-between px-4 md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:flex-row md:items-center md:px-8">
           <motion.h1 style={{ x: leftX, opacity: fade }} className="font-display text-[21vw] font-medium leading-none tracking-[-0.03em] text-ivory md:text-[11.5vw]">
             <span className="block overflow-hidden">
               <motion.span className="block" initial={{ y: "105%" }} animate={{ y: 0 }} transition={{ duration: 1.4, ease, delay: 0.35 }}>
@@ -102,7 +104,7 @@ export default function Hero() {
           <motion.div style={{ opacity: overlay }} className="absolute inset-0 bg-night" />
           <div className="absolute inset-0 bg-gradient-to-t from-night/70 via-transparent to-transparent" />
 
-          <motion.div style={{ opacity: endText, y: endY }} className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+          <motion.div style={{ opacity: endText, y: endY, pointerEvents: endPointer }} className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
             <p className="text-xs uppercase tracking-[0.4em] text-gold">Sangeetmay Shri Sundarkand</p>
             <p className="mt-5 max-w-4xl font-display text-4xl leading-[1.05] text-ivory md:text-7xl">
               Where <span className="italic text-gold">bhakti</span> meets the stage.
