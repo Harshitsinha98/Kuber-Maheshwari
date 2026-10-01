@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { getEvent } from "@/lib/queries";
-import { remainingSeats } from "@/lib/tickets";
+import { getEvent, seatsLeftForEvent } from "@/lib/queries";
 import { fmtDate, fmtTime } from "@/lib/format";
-import { razorpayEnabled } from "@/lib/razorpay";
+import { razorpayEnabled, razorpayTestMode } from "@/lib/razorpay";
 import { site } from "@/lib/site";
 import { getSession } from "@/lib/auth";
 import { Reveal, SplitText } from "@/components/motion/Reveal";
@@ -30,16 +29,15 @@ export default async function EventPage({ params }: Props) {
   if (!e) notFound();
   const draft = e.status === "DRAFT";
 
-  const types = await Promise.all(
-    e.ticketTypes.map(async (t) => ({
-      id: t.id,
-      name: t.name,
-      description: t.description,
-      price: t.price,
-      maxPerOrder: t.maxPerOrder,
-      remaining: await remainingSeats(t.id),
-    }))
-  );
+  const left = await seatsLeftForEvent(e.id, e.ticketTypes);
+  const types = e.ticketTypes.map((t) => ({
+    id: t.id,
+    name: t.name,
+    description: t.description,
+    price: t.price,
+    maxPerOrder: t.maxPerOrder,
+    remaining: left.get(t.id) ?? 0,
+  }));
   const place = `${e.venueName}, ${e.address}, ${e.city}`;
   const mapQ = encodeURIComponent(place);
   const past = e.startsAt.getTime() < Date.now() - 6 * 3600e3;
@@ -127,6 +125,7 @@ export default async function EventPage({ params }: Props) {
             disabled={e.status === "CANCELLED" || past || draft}
             disabledReason={draft ? "Not published yet" : e.status === "CANCELLED" ? "Event cancelled" : past ? "This event has ended" : undefined}
             paymentsEnabled={razorpayEnabled()}
+            testMode={razorpayEnabled() && razorpayTestMode()}
           />
         </aside>
       </div>

@@ -55,7 +55,10 @@ Settings → Webhooks → URL `https://<domain>/api/razorpay/webhook`, events `p
 Until keys are added, paid ticket types show "Online booking opening soon" and free events still work.
 
 ### Email (Resend)
-Create an API key → `RESEND_API_KEY`. Verify your domain (DNS records) so `EMAIL_FROM` can be e.g. `tickets@your-domain.com`. `NOTIFY_EMAIL` receives booking/enquiry alerts.
+1. resend.com → API Keys → create a key → add `RESEND_API_KEY` in Vercel → redeploy. That's all: ticket emails, booking/enquiry alerts, enquiry replies and next-day reminders switch on automatically.
+2. Admin → **Email** shows the status, lets you send a test email, re-send tickets that weren't emailed, and trigger reminders.
+3. **Until a domain is verified** Resend's testing sender only delivers to your own Resend account email, so customers won't get emails yet (their QR tickets are always under *My Tickets*). After verifying the domain in Resend → Domains, set `EMAIL_FROM="Kuber Maheshwari <tickets@your-domain.com>"` and redeploy.
+4. `NOTIFY_EMAIL` (optional) gets owner alerts; defaults to the first `ADMIN_EMAILS` address. Reminders run daily at 10:00 IST via `/api/cron/reminders`.
 
 ### Instagram feed (no watermark)
 1. Instagram account must be **Professional** (Creator or Business).

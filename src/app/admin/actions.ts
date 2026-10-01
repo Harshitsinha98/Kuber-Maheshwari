@@ -9,6 +9,7 @@ import { requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { fromLocalIST, slugify } from "@/lib/format";
 import { refreshInstagramToken, setSetting } from "@/lib/social";
+import { sendTestEmail, sendTicketEmailAndMark, sendTomorrowReminders } from "@/lib/email";
 
 async function admin() {
   const s = await requireRole(["ADMIN"]);
@@ -135,8 +136,49 @@ export async function manualCheckIn(ticketId: string, undo = false) {
 
 export async function resendTickets(bookingId: string) {
   await admin();
-  const { sendTicketEmail } = await import("@/lib/email");
-  await sendTicketEmail(bookingId);
+  await sendTicketEmailAndMark(bookingId);
+  revalidatePath("/admin/email");
+  revalidatePath("/admin/bookings");
+}
+
+// ---------- Email ----------
+
+export type EmailActionState = { ok?: string; error?: string } | undefined;
+
+export async function sendTestEmailAction(_prev: EmailActionState, fd: FormData): Promise<EmailActionState> {
+  await admin();
+  const to = String(fd.get("to") || "").trim();
+  if (!z.string().email().safeParse(to).success) return { error: "Enter a valid email address" };
+  const r = await sendTestEmail(to);
+  revalidatePath("/admin/email");
+  return r.ok ? { ok: `Test email sent to ${to}. Check the inbox (and spam folder).` } : { error: r.error };
+}
+
+export async function resendUnsentTickets(): Promise<EmailActionState> {
+  await admin();
+  const pending = await prisma.booking.findMany({ where: { status: "PAID", emailSentAt: null }, select: { id: true }, take: 50 });
+  if (!pending.length) return { ok: "Nothing to send: every paid booking has received its tickets." };
+  let sent = 0;
+  let lastError = "";
+  for (const b of pending) {
+    const r = await sendTicketEmailAndMark(b.id);
+    if (r.ok) sent++;
+    else lastError = r.error;
+  }
+  revalidatePath("/admin/email");
+  revalidatePath("/admin/bookings");
+  return sent === pending.length
+    ? { ok: `Sent tickets for ${sent} booking${sent > 1 ? "s" : ""}.` }
+    : { error: `Sent ${sent} of ${pending.length}. Last error: ${lastError}` };
+}
+
+export async function sendRemindersNow(): Promise<EmailActionState> {
+  await admin();
+  const r = await sendTomorrowReminders();
+  if (!r.events.length) return { ok: "No published events tomorrow, so no reminders were needed." };
+  return {
+    ok: r.events.map((e) => (e.skipped ? `${e.event}: ${e.skipped}` : `${e.event}: ${e.sent} sent${e.failed ? `, ${e.failed} failed` : ""}`)).join(" · "),
+  };
 }
 
 // ---------- Media ----------

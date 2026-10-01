@@ -68,10 +68,15 @@ export async function fulfilBooking(bookingId: string, paymentId?: string) {
     data: { emailSentAt: new Date() },
   });
   if (claim.count === 1) {
-    await sendTicketEmail(booking.id).catch(async (e) => {
-      console.error("[email] ticket email failed", e);
-      await prisma.booking.update({ where: { id: booking.id }, data: { emailSentAt: null } });
-    });
+    // If email isn't set up yet or fails, emailSentAt goes back to null so the booking
+    // shows up under Admin → Email → "Tickets not emailed" and can be re-sent later.
+    const ok = await sendTicketEmail(booking.id)
+      .then((r) => r.ok)
+      .catch((e) => {
+        console.error("[email] ticket email failed", e);
+        return false;
+      });
+    if (!ok) await prisma.booking.update({ where: { id: booking.id }, data: { emailSentAt: null } });
   }
   return booking;
 }

@@ -78,6 +78,11 @@ export default async function Bookings({ searchParams }: { searchParams: Promise
                 <td className="px-5 py-3 tabular-nums">{rupees(b.amount)}</td>
                 <td className="px-5 py-3">
                   <Badge tone={b.status === "PAID" ? "green" : b.status === "PENDING" ? "amber" : "red"}>{b.status}</Badge>
+                  {b.status === "PAID" && !b.emailSentAt && (
+                    <Link href="/admin/email" className="ml-1 inline-block rounded-full bg-amber-100 px-2.5 py-0.5 text-xs text-amber-800 hover:underline">
+                      ✉ not emailed
+                    </Link>
+                  )}
                 </td>
               </tr>
             ))}

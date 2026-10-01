@@ -1,3 +1,7 @@
 {
-  "crons": [{ "path": "/api/cron/social", "schedule": "0 3 * * 1" }]
+  "regions": ["bom1"],
+  "crons": [
+    { "path": "/api/cron/social", "schedule": "0 3 * * 1" },
+    { "path": "/api/cron/reminders", "schedule": "30 4 * * *" }
+  ]
 }

@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { prisma, safe } from "./prisma";
 import galleryFallback from "@/data/gallery.json";
 
@@ -70,8 +71,11 @@ export const getPastEvents = (take = 12) =>
     [] as EventCard[]
   );
 
-/** includeDrafts: admins can preview an event before publishing it. */
-export const getEvent = (slug: string, includeDrafts = false) =>
+/**
+ * includeDrafts: admins can preview an event before publishing it.
+ * Wrapped in React cache() so generateMetadata + the page share one DB query per request.
+ */
+export const getEvent = cache((slug: string, includeDrafts = false) =>
   safe(
     () =>
       prisma.event.findFirst({
@@ -79,7 +83,24 @@ export const getEvent = (slug: string, includeDrafts = false) =>
         include: { ticketTypes: { orderBy: [{ sortOrder: "asc" }, { price: "asc" }] } },
       }),
     null
+  )
+);
+
+/** Seats left for every ticket type of an event in ONE query (paid + recent unpaid holds count as taken). */
+export async function seatsLeftForEvent(eventId: string, types: { id: string; capacity: number }[]) {
+  const holdSince = new Date(Date.now() - 15 * 60 * 1000);
+  const taken = await safe(
+    () =>
+      prisma.booking.groupBy({
+        by: ["ticketTypeId"],
+        _sum: { quantity: true },
+        where: { eventId, OR: [{ status: "PAID" }, { status: "PENDING", createdAt: { gte: holdSince } }] },
+      }),
+    []
   );
+  const used = new Map(taken.map((t) => [t.ticketTypeId, t._sum.quantity || 0]));
+  return new Map(types.map((t) => [t.id, Math.max(0, t.capacity - (used.get(t.id) || 0))]));
+}
 
 export type GalleryImage = { id?: string; src: string; width: number; height: number; caption?: string | null };
 

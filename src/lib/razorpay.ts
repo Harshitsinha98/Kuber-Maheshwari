@@ -3,6 +3,11 @@ import Razorpay from "razorpay";
 
 export const razorpayEnabled = () => Boolean(process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET);
 
+/** Test keys (rzp_test_…) never move real money. */
+export const razorpayTestMode = () => (process.env.RAZORPAY_KEY_ID || "").startsWith("rzp_test_");
+
+export const razorpayWebhookConfigured = () => Boolean(process.env.RAZORPAY_WEBHOOK_SECRET);
+
 export const razorpay = () =>
   new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID!, key_secret: process.env.RAZORPAY_KEY_SECRET! });
 

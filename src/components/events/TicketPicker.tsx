@@ -33,12 +33,14 @@ export default function TicketPicker({
   disabled,
   disabledReason,
   paymentsEnabled,
+  testMode = false,
 }: {
   event: { id: string; slug: string; title: string };
   types: TT[];
   disabled?: boolean;
   disabledReason?: string;
   paymentsEnabled: boolean;
+  testMode?: boolean;
 }) {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -217,6 +219,11 @@ export default function TicketPicker({
       <p className="mt-4 text-center text-[11px] text-muted">
         {t?.price === 0 ? "Free pass · Instant QR e-ticket" : "Secure payment via UPI / Cards / Netbanking · Instant QR e-ticket"}
       </p>
+      {testMode && t && t.price > 0 && (
+        <p className="mt-3 rounded border border-marigold/40 bg-marigold/10 px-3 py-2 text-center text-[11px] text-marigold">
+          Test mode: no real money is charged. Use Razorpay test UPI <b>success@razorpay</b> or card 4111 1111 1111 1111.
+        </p>
+      )}
       </>
       )}
     </div>
