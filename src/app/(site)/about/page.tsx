@@ -45,23 +45,22 @@ export default function About() {
 
       <section className="mx-auto max-w-[1500px] px-5 py-28 md:px-10 md:py-40">
         <Reveal>
-          <p className="text-xs uppercase tracking-[0.35em] text-gold"><Tracked text="यात्रा · The journey" /></p>
+          <p className="font-hindi text-lg text-gold">यात्रा</p>
+          <h2 className="mt-3 font-hindi text-4xl leading-[1.4] text-ivory md:text-5xl">संगीत से साधना तक का सफ़र</h2>
         </Reveal>
-        <ol className="relative mt-14">
-          <span className="absolute left-[7px] top-0 h-full w-px bg-gradient-to-b from-gold/60 via-gold/20 to-transparent md:left-[calc(25%+7px)]" />
-          {journey.map((j, i) => (
-            <li key={j.year} className="relative grid gap-4 pb-20 pl-10 md:grid-cols-4 md:pl-0">
-              <span className="absolute left-0 top-3 h-[15px] w-[15px] rounded-full border border-gold bg-night md:left-[25%]" />
+        <ol className="relative mt-16">
+          <span className="absolute left-[7px] top-0 h-full w-px bg-gradient-to-b from-gold/60 via-gold/20 to-transparent md:left-[240px]" />
+          {journey.map((j) => (
+            <li key={j.year} className="relative grid gap-3 pb-20 pl-10 md:grid-cols-[240px_1fr] md:gap-0 md:pl-0">
+              <span className="absolute left-0 top-3 h-[15px] w-[15px] rounded-full border border-gold bg-night md:left-[233px] md:top-5" />
               <Reveal className="md:pr-12 md:text-right">
-                <p className={`${/[\u0900-\u097F]/.test(j.year) ? "font-hindi" : "font-display"} text-5xl text-gold md:text-6xl`}>{j.year}</p>
+                <p className={`whitespace-nowrap text-gold ${/[\u0900-\u097F]/.test(j.year) ? "font-hindi text-4xl leading-[1.5] md:text-[2.6rem]" : "font-display text-5xl leading-[1.2] md:text-[3.4rem]"}`}>{j.year}</p>
               </Reveal>
-              <Reveal delay={0.1} className="md:col-span-3 md:pl-16">
-                <h3 className="font-hindi text-3xl text-ivory md:text-4xl">{j.title}</h3>
-                <p className="mt-4 max-w-2xl text-lg leading-relaxed text-ivory/70">{j.text}</p>
-                {i === 2 && (
-                  <p className="mt-4 max-w-2xl text-sm italic text-muted">
-                    “इतने समय में मैने अच्छे-बुरे, छोटे-बड़े, सिद्ध-प्रसिद्ध बहुत से गायक गायिकाओं को देखा, सुना और समझा।”
-                  </p>
+              <Reveal delay={0.1} className="md:pl-16">
+                <h3 className="font-hindi text-3xl leading-[1.5] text-ivory md:text-4xl">{j.title}</h3>
+                <p className="mt-3 max-w-2xl text-lg leading-[1.9] text-ivory/75">{j.text}</p>
+                {"quote" in j && j.quote && (
+                  <blockquote className="mt-5 max-w-2xl border-l-2 border-saffron/60 pl-5 font-hindi text-lg leading-[1.8] text-gold-soft">“{j.quote}”</blockquote>
                 )}
               </Reveal>
             </li>

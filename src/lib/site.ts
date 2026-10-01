@@ -94,21 +94,22 @@ export const journey = [
   {
     year: "बचपन",
     title: "पिताजी के साथ भजन-कीर्तन",
-    text: "Grew up going to bhajan-kirtans with his father. Religious gatherings, more than anything else, shaped his ear. By class 9th–10th, music had become his calling.",
+    text: "बचपन से ही पिताजी के साथ भजन-कीर्तन में आना-जाना लगा रहता था। अन्य आयोजनों की अपेक्षा धार्मिक आयोजनों में उपस्थिति अधिक रहती थी। यही कारण था कि कक्षा 9वीं–10वीं तक आते-आते संगीत के प्रति रुचि बहुत प्रबल हो चुकी थी।",
   },
   {
     year: "2008",
     title: "सिंथेसाइज़र वादक के रूप में शुरुआत",
-    text: "Right after the 12th board exams, he started playing synthesizer at bhajans, Sundarkand, Mata Jagran, Shyam Kirtan and weddings.",
+    text: "12वीं की परीक्षा के बाद से ही संगीतमय आयोजनों में सिंथेसाइज़र बजाना शुरू किया: भजन, सुंदरकांड, माता जागरण, श्याम कीर्तन एवं वैवाहिक आयोजन।",
   },
   {
-    year: "2014 – 2018",
+    year: "2014–18",
     title: "देश के दिग्गज भजन गायकों के साथ",
-    text: "Toured every corner of the country as synthesizer player for renowned bhajan singers including Lakhbir Singh Lakkha, Baba Rasika Pagal, Uma Lahari and Reshmi Sharma. He saw, heard and learnt from singers of every kind.",
+    text: "लखबीर सिंह लक्खा, बाबा रसिका पागल, उमा लहरी, रेशमी शर्मा जैसे देश के सुप्रसिद्ध भजन गायक-गायिकाओं के साथ सिंथेसाइज़र वादक के रूप में देश के कोने-कोने में अपनी सेवाएँ दीं।",
+    quote: "इतने समय में मैंने अच्छे-बुरे, छोटे-बड़े, सिद्ध-प्रसिद्ध बहुत से गायक-गायिकाओं को देखा, सुना और समझा।",
   },
   {
-    year: "2018 — आज",
+    year: "2018 से आज",
     title: "एक व्यवस्थित भजन गायक",
-    text: "Stepped forward as a bhajan singer in his own right, known today for Sangeetmay Shri Sundarkand (with bhavarth). He also runs his recording studio, K M Audio Productions.",
+    text: "2018 से अब तक, स्वयं को एक व्यवस्थित भजन गायक के रूप में स्थापित करने की साधना जारी है। आज इनकी विशेष पहचान है संगीतमय श्री सुन्दरकाण्ड प्रस्तुति (भावार्थ सहित)। साथ ही इंदौर में अपना रिकॉर्डिंग स्टूडियो “K M Audio Productions” भी चलाते हैं।",
   },
 ];

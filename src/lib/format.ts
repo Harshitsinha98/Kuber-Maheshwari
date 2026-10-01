@@ -40,3 +40,13 @@ export const toLocalIST = (d?: Date | null) => {
   const ist = new Date(d.getTime() + 5.5 * 3600 * 1000);
   return ist.toISOString().slice(0, 16);
 };
+
+/** Hindi date: "शुक्रवार, 2 अक्तूबर 2026" */
+export const fmtDateHi = (d: Date | string) =>
+  new Intl.DateTimeFormat("hi-IN", { timeZone: tz, weekday: "long", day: "numeric", month: "long", year: "numeric", numberingSystem: "latn" }).format(new Date(d));
+
+export const fmtTimeHi = (d: Date | string) =>
+  new Intl.DateTimeFormat("hi-IN", { timeZone: tz, hour: "numeric", minute: "2-digit", numberingSystem: "latn" }).format(new Date(d));
+
+export const monthHi = (d: Date | string) =>
+  new Intl.DateTimeFormat("hi-IN", { timeZone: tz, month: "short" }).format(new Date(d));

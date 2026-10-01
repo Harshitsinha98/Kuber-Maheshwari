@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PageHeader from "@/components/site/PageHeader";
 import EventList from "@/components/events/EventList";
+import EventShowcase from "@/components/events/EventShowcase";
 import { Reveal } from "@/components/motion/Reveal";
 import { getPastEvents, getUpcomingEvents } from "@/lib/queries";
 
@@ -24,7 +25,7 @@ export default async function Events() {
       />
       <section className="mx-auto max-w-[1500px] px-5 pb-28 md:px-10">
         {upcoming.length ? (
-          <EventList events={upcoming} />
+          <EventShowcase events={upcoming} />
         ) : (
           <Reveal>
             <div className="border-y border-ivory/10 py-20 text-center">

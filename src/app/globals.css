@@ -115,6 +115,45 @@ select.field option { background: var(--color-night-2); }
 }
 .admin-input:focus { outline: 2px solid #e8820c55; border-color: #e8820c; }
 
+/* ---------- Events showcase ---------- */
+/* Toran: a strip of marigold flowers + mango leaves, like the garland over a temple door */
+.toran {
+  height: 22px;
+  background-image:
+    radial-gradient(circle at 11px 8px, #f3a53a 0 6px, #e8820c 6.5px 8px, transparent 8.5px),
+    radial-gradient(circle at 33px 6px, #fbd36b 0 4px, #e8a50c 4.5px 6px, transparent 6.5px),
+    linear-gradient(135deg, transparent 40%, #2f6b2f 41% 58%, transparent 59%);
+  background-size: 44px 22px, 44px 22px, 22px 22px;
+  background-repeat: repeat-x;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.35));
+}
+.flame-glow {
+  background: radial-gradient(60% 55% at 70% 40%, rgba(232, 130, 12, 0.55), transparent 70%),
+    radial-gradient(45% 50% at 20% 85%, rgba(158, 42, 43, 0.6), transparent 70%);
+  animation: flame 6s ease-in-out infinite alternate;
+}
+@keyframes flame {
+  0% { opacity: 0.75; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.08); }
+}
+.shine {
+  position: relative;
+  overflow: hidden;
+}
+.shine::after {
+  content: "";
+  position: absolute;
+  inset: -40% auto -40% -60%;
+  width: 40%;
+  transform: rotate(20deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  animation: shine 3.2s ease-in-out infinite;
+}
+@keyframes shine {
+  0%, 55% { left: -60%; }
+  100% { left: 130%; }
+}
+
 /* Printing a ticket: just the ticket, on white paper */
 @media print {
   html, body { background: #fff !important; color: #1d1416 !important; }
@@ -123,5 +162,5 @@ select.field option { background: var(--color-night-2); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .marquee, .gold-text { animation: none; }
+  .marquee, .gold-text, .flame-glow, .shine::after { animation: none; }
 }

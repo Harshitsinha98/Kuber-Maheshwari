@@ -13,6 +13,9 @@ export type EventCard = {
   posterUrl: string | null;
   fromPrice: number | null;
   status: string;
+  /** seats still bookable across all ticket types (only filled for upcoming events) */
+  seatsLeft?: number | null;
+  capacity?: number;
 };
 
 const cardSelect = {
@@ -25,10 +28,10 @@ const cardSelect = {
   city: true,
   posterUrl: true,
   status: true,
-  ticketTypes: { select: { price: true } },
+  ticketTypes: { select: { price: true, capacity: true } },
 } as const;
 
-type Row = { ticketTypes: { price: number }[]; startsAt: Date } & Omit<EventCard, "fromPrice" | "startsAt">;
+type Row = { ticketTypes: { price: number; capacity: number }[]; startsAt: Date } & Omit<EventCard, "fromPrice" | "startsAt" | "seatsLeft" | "capacity">;
 
 /** Lowest paid price; 0 only if every ticket type is free; null if none. */
 const lowestPrice = (prices: number[]) => {
@@ -37,25 +40,36 @@ const lowestPrice = (prices: number[]) => {
   return paid.length ? Math.min(...paid) : 0;
 };
 
-const toCard = (e: Row): EventCard => ({
+const toCard = ({ ticketTypes, ...e }: Row): EventCard => ({
   ...e,
   startsAt: e.startsAt.toISOString(),
-  fromPrice: lowestPrice(e.ticketTypes.map((t) => t.price)),
+  fromPrice: lowestPrice(ticketTypes.map((t) => t.price)),
+  capacity: ticketTypes.reduce((a, t) => a + t.capacity, 0),
 });
 
+/** Adds seatsLeft to cards with one grouped query (paid + recent unpaid holds count as taken). */
+async function withSeats(cards: EventCard[]) {
+  if (!cards.length) return cards;
+  const holdSince = new Date(Date.now() - 15 * 60 * 1000);
+  const taken = await prisma.booking.groupBy({
+    by: ["eventId"],
+    _sum: { quantity: true },
+    where: { eventId: { in: cards.map((c) => c.id) }, OR: [{ status: "PAID" }, { status: "PENDING", createdAt: { gte: holdSince } }] },
+  });
+  const used = new Map(taken.map((t) => [t.eventId, t._sum.quantity || 0]));
+  return cards.map((c) => ({ ...c, seatsLeft: c.capacity ? Math.max(0, c.capacity - (used.get(c.id) || 0)) : null }));
+}
+
 export const getUpcomingEvents = (take = 20) =>
-  safe(
-    async () =>
-      (
-        await prisma.event.findMany({
-          where: { status: { in: ["PUBLISHED", "CANCELLED"] }, startsAt: { gte: new Date(Date.now() - 6 * 3600e3) } },
-          orderBy: { startsAt: "asc" },
-          take,
-          select: cardSelect,
-        })
-      ).map(toCard),
-    [] as EventCard[]
-  );
+  safe(async () => {
+    const rows = await prisma.event.findMany({
+      where: { status: { in: ["PUBLISHED", "CANCELLED"] }, startsAt: { gte: new Date(Date.now() - 6 * 3600e3) } },
+      orderBy: { startsAt: "asc" },
+      take,
+      select: cardSelect,
+    });
+    return withSeats(rows.map(toCard));
+  }, [] as EventCard[]);
 
 export const getPastEvents = (take = 12) =>
   safe(
