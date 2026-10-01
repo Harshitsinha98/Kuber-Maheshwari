@@ -9,7 +9,7 @@ import { useSession } from "next-auth/react";
 import { site } from "@/lib/site";
 
 const links = [
-  { href: "/", label: "Home", hi: "मुख्य", img: "/images/gallery/kuber-04.webp" },
+  { href: "/", label: "Home", hi: "मुख्य", img: "/images/gallery/kuber-25.webp" },
   { href: "/about", label: "About", hi: "परिचय", img: "/images/gallery/kuber-07.webp" },
   { href: "/services", label: "Services", hi: "सेवाएँ", img: "/images/gallery/kuber-06.webp" },
   { href: "/events", label: "Events", hi: "कार्यक्रम", img: "/images/gallery/kuber-01.webp" },
@@ -142,7 +142,7 @@ export default function Navbar() {
                     transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
                     className="absolute inset-0"
                   >
-                    <Image src={preview} alt="" fill sizes="40vw" className="object-cover" />
+                    <Image src={preview} alt="" fill sizes="40vw" quality={90} className="object-cover object-[50%_28%]" />
                   </motion.div>
                 </AnimatePresence>
                 <div className="absolute inset-0 bg-gradient-to-t from-night/80 via-transparent" />

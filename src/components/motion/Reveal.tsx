@@ -54,11 +54,15 @@ export function SplitText({
   return (
     <MotionTag ref={ref as never} className={className} aria-label={text}>
       {words.map((w, i) => (
-        <span key={i} className="inline-block overflow-hidden pb-[0.12em] -mb-[0.12em] align-bottom" aria-hidden>
+        <span
+          key={i}
+          className={`inline-block overflow-hidden align-bottom ${/[\u0900-\u097F]/.test(w) ? "-mx-[0.12em] -my-[0.45em] px-[0.12em] py-[0.45em]" : "-my-[0.2em] py-[0.2em]"}`}
+          aria-hidden
+        >
           <motion.span
             className="inline-block will-change-transform"
-            initial={{ y: "110%", rotate: 4 }}
-            animate={show ? { y: "0%", rotate: 0 } : undefined}
+            initial={{ y: "200%", rotate: 4, opacity: 0 }}
+            animate={show ? { y: "0%", rotate: 0, opacity: 1 } : undefined}
             transition={{ duration: 1.1, ease, delay: delay + i * stagger }}
           >
             {w}
@@ -108,32 +112,29 @@ export function ParallaxImage({
   src,
   alt,
   className,
-  strength = 12,
   priority,
+  focus = "50% 28%",
   sizes = "(max-width: 768px) 100vw, 50vw",
 }: {
   src: string;
   alt: string;
   className?: string;
+  /** kept for older call sites; images no longer zoom/drift (that made them blurry) */
   strength?: number;
   priority?: boolean;
+  /** CSS object-position: where the face is, so cropping never cuts it */
+  focus?: string;
   sizes?: string;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], [`-${strength}%`, `${strength}%`]);
   return (
     <motion.div
-      ref={ref}
       className={`relative overflow-hidden ${className ?? ""}`}
       initial={{ clipPath: "inset(12% 12% 12% 12%)" }}
       whileInView={{ clipPath: "inset(0% 0% 0% 0%)" }}
       viewport={{ once: true, margin: "-10% 0px" }}
       transition={{ duration: 1.4, ease }}
     >
-      <motion.div style={{ y, scale: 1 + strength / 50 }} className="absolute inset-0">
-        <Image src={src} alt={alt} fill sizes={sizes} className="object-cover" priority={priority} />
-      </motion.div>
+      <Image src={src} alt={alt} fill sizes={sizes} quality={90} className="object-cover" style={{ objectPosition: focus }} priority={priority} />
     </motion.div>
   );
 }

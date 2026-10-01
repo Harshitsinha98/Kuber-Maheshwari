@@ -13,7 +13,7 @@ const jsonLd = {
   alternateName: ["कुबेर माहेश्वरी", "Ankit Maheshwari"],
   genre: ["Bhajan", "Devotional", "Sundarkand", "Bhakti Fusion"],
   url: site.url,
-  image: `${site.url}/images/gallery/kuber-07.webp`,
+  image: `${site.url}/images/gallery/kuber-25.webp`,
   telephone: site.phones.map((p) => p.tel),
   foundingLocation: { "@type": "Place", name: "Indore, Madhya Pradesh, India" },
   sameAs: Object.values(site.social),
@@ -21,7 +21,7 @@ const jsonLd = {
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grain">
+    <div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <SmoothScroll />
       <Cursor />

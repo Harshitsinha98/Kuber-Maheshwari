@@ -26,7 +26,6 @@ export default function Hero() {
   const width = useTransform(scrollYProgress, (v) => `calc(var(--aw) + (100vw - var(--aw)) * ${ramp(v, 0, 0.7)})`);
   const height = useTransform(scrollYProgress, (v) => `calc(var(--ah) + (100vh - var(--ah)) * ${ramp(v, 0, 0.7)})`);
   const radius = useTransform(scrollYProgress, [0, 0.6], ["999px 999px 0px 0px", "0px 0px 0px 0px"]);
-  const imgScale = useTransform(scrollYProgress, [0, 1], [1.15, 1]);
   const leftX = useTransform(scrollYProgress, [0, 0.6], ["0vw", "-40vw"]);
   const rightX = useTransform(scrollYProgress, [0, 0.6], ["0vw", "40vw"]);
   // Opacity ramps computed explicitly so they stay clamped at both ends.
@@ -69,15 +68,15 @@ export default function Hero() {
 
         <div className="pointer-events-none absolute inset-x-0 bottom-[13svh] top-[18.5svh] z-10 flex flex-col justify-between px-4 md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:flex-row md:items-center md:px-8">
           <motion.h1 style={{ x: leftX, opacity: fade }} className="font-display text-[21vw] font-medium leading-none tracking-[-0.03em] text-ivory md:text-[11.5vw]">
-            <span className="block overflow-hidden">
-              <motion.span className="block" initial={{ y: "105%" }} animate={{ y: 0 }} transition={{ duration: 1.4, ease, delay: 0.35 }}>
+            <span className="-my-[0.15em] block overflow-hidden py-[0.15em]">
+              <motion.span className="block" initial={{ y: "125%" }} animate={{ y: 0 }} transition={{ duration: 1.4, ease, delay: 0.35 }}>
                 Kuber
               </motion.span>
             </span>
           </motion.h1>
           <motion.span style={{ x: rightX, opacity: fade }} className="self-end font-display text-[16vw] font-medium italic leading-none tracking-[-0.03em] text-gold md:self-auto md:text-[11.5vw]" aria-hidden>
-            <span className="block overflow-hidden">
-              <motion.span className="block" initial={{ y: "105%" }} animate={{ y: 0 }} transition={{ duration: 1.4, ease, delay: 0.5 }}>
+            <span className="-my-[0.15em] block overflow-hidden py-[0.15em] pr-[0.1em]">
+              <motion.span className="block" initial={{ y: "125%" }} animate={{ y: 0 }} transition={{ duration: 1.4, ease, delay: 0.5 }}>
                 Maheshwari
               </motion.span>
             </span>
@@ -91,16 +90,16 @@ export default function Hero() {
           transition={{ duration: 1.6, ease, delay: 0.15 }}
           className="relative z-[5] mt-[4vh] overflow-hidden md:mt-[10vh]"
         >
-          <motion.div style={{ scale: imgScale }} className="absolute inset-0">
-            <Image
-              src="/images/gallery/kuber-04.webp"
-              alt="Kuber Maheshwari singing live on stage"
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover object-[50%_25%]"
-            />
-          </motion.div>
+          {/* 1550×1550 original: stays sharp even when the frame opens to full screen. */}
+          <Image
+            src="/images/gallery/kuber-25.webp"
+            alt="Kuber Maheshwari singing live"
+            fill
+            priority
+            quality={90}
+            sizes="100vw"
+            className="object-cover object-[45%_32%]"
+          />
           <motion.div style={{ opacity: overlay }} className="absolute inset-0 bg-night" />
           <div className="absolute inset-0 bg-gradient-to-t from-night/70 via-transparent to-transparent" />
 

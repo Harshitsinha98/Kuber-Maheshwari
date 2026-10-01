@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   experimental: { serverActions: { bodySizeLimit: "4mb" } },
   images: {
     formats: ["image/avif", "image/webp"],
+    qualities: [75, 90],
     remotePatterns: [
       { protocol: "https", hostname: "**.public.blob.vercel-storage.com" },
       { protocol: "https", hostname: "lh3.googleusercontent.com" },

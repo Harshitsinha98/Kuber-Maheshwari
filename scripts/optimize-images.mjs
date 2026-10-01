@@ -1,11 +1,15 @@
-// One-time helper: converts raw WhatsApp uploads into web-optimized images.
-// Usage: node scripts/optimize-images.mjs <sourceDir>
+// Converts the original uploads into web images.
+// Usage: node scripts/optimize-images.mjs [sourceDir]
+// Keeps full original resolution (capped at 2000px) and encodes at high quality,
+// because the originals are already compressed (WhatsApp) and can't afford more loss.
 import fs from "node:fs";
 import path from "node:path";
 import sharp from "sharp";
 
-const src = process.argv[2] || "raw-media";
+const src = process.argv[2] || "assets/original-photos";
 const outDir = path.join("public", "images", "gallery");
+// kuber-13 and kuber-22 are logo artwork (used as the site logo), not gallery photos.
+const SKIP = new Set(["kuber-13", "kuber-22"]);
 fs.mkdirSync(outDir, { recursive: true });
 
 const files = fs
@@ -16,24 +20,20 @@ const files = fs
 const manifest = [];
 let i = 1;
 for (const f of files) {
-  const name = `kuber-${String(i).padStart(2, "0")}.webp`;
-  const img = sharp(path.join(src, f)).rotate();
-  const meta = await img.metadata();
-  const info = await img
-    .resize({ width: 1600, height: 1600, fit: "inside", withoutEnlargement: true })
-    .webp({ quality: 80 })
-    .toFile(path.join(outDir, name));
+  const base = `kuber-${String(i++).padStart(2, "0")}`;
+  if (SKIP.has(base)) continue;
+  const info = await sharp(path.join(src, f))
+    .rotate()
+    .resize({ width: 2000, height: 2000, fit: "inside", withoutEnlargement: true })
+    .webp({ quality: 90, smartSubsample: true, effort: 6 })
+    .toFile(path.join(outDir, `${base}.webp`));
   manifest.push({
-    src: `/images/gallery/${name}`,
+    src: `/images/gallery/${base}.webp`,
     width: info.width,
     height: info.height,
-    orientation: (meta.height ?? 0) > (meta.width ?? 0) ? "portrait" : "landscape",
+    orientation: info.height > info.width ? "portrait" : "landscape",
   });
-  i++;
 }
 
-fs.writeFileSync(
-  path.join("src", "data", "gallery.json"),
-  JSON.stringify(manifest, null, 2)
-);
+fs.writeFileSync(path.join("src", "data", "gallery.json"), JSON.stringify(manifest, null, 2) + "\n");
 console.log(`Optimized ${manifest.length} images`);

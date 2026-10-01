@@ -97,7 +97,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-24 select-none overflow-hidden pb-[2vw]">
-          <p className="whitespace-nowrap text-center font-hindi text-[22vw] leading-[1.15] text-outline md:text-[17vw]" aria-hidden>
+          <p className="whitespace-nowrap text-center font-hindi text-[16vw] leading-[1.4] text-outline md:text-[15vw]" aria-hidden>
             कुबेर माहेश्वरी
           </p>
         </div>

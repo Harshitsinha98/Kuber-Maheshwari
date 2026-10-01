@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${e.title}, ${e.city} · ${fmtDate(e.startsAt)}`,
     description: e.subtitle || e.description.slice(0, 160),
-    openGraph: { images: e.posterUrl ? [e.posterUrl] : ["/images/gallery/kuber-01.webp"] },
+    openGraph: { images: e.posterUrl ? [e.posterUrl] : ["/images/gallery/kuber-25.webp"] },
   };
 }
 
@@ -53,7 +53,7 @@ export default async function EventPage({ params }: Props) {
     eventStatus: e.status === "CANCELLED" ? "https://schema.org/EventCancelled" : "https://schema.org/EventScheduled",
     location: { "@type": "Place", name: e.venueName, address: `${e.address}, ${e.city}` },
     performer: { "@type": "Person", name: "Kuber Maheshwari" },
-    image: e.posterUrl || `${site.url}/images/gallery/kuber-01.webp`,
+    image: e.posterUrl || `${site.url}/images/gallery/kuber-25.webp`,
     offers: e.ticketTypes.map((t) => ({ "@type": "Offer", name: t.name, price: t.price / 100, priceCurrency: "INR", url: `${site.url}/events/${e.slug}` })),
   };
 
@@ -61,7 +61,7 @@ export default async function EventPage({ params }: Props) {
     <article>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="relative h-[78vh] min-h-[520px] overflow-hidden">
-        <Image src={e.posterUrl || "/images/gallery/kuber-01.webp"} alt={e.title} fill priority sizes="100vw" className="object-cover" />
+        <Image src={e.posterUrl || "/images/gallery/kuber-25.webp"} alt={e.title} fill priority quality={90} sizes="100vw" className="object-cover object-[50%_30%]" />
         <div className="absolute inset-0 bg-gradient-to-t from-night via-night/60 to-night/20" />
         <div className="absolute inset-x-0 bottom-0 mx-auto max-w-[1500px] px-5 pb-14 md:px-10">
           <p className="text-xs uppercase tracking-[0.35em] text-saffron">{e.category}</p>

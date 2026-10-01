@@ -32,7 +32,7 @@ export default function EventList({ events, past = false }: { events: EventCard[
                 </div>
                 <div className="min-w-0">
                   <p className="text-[11px] uppercase tracking-[0.3em] text-saffron">{e.category}</p>
-                  <h3 className={`mt-2 truncate font-display text-2xl text-ivory transition-all duration-500 group-hover:translate-x-2 group-hover:italic md:text-4xl ${cancelled ? "line-through opacity-50" : ""}`}>
+                  <h3 className={`mt-2 break-words font-display text-2xl leading-[1.2] text-ivory transition-all duration-500 group-hover:translate-x-2 group-hover:italic md:text-4xl ${cancelled ? "line-through opacity-50" : ""}`}>
                     {e.title}
                   </h3>
                   <p className="mt-1 text-sm text-muted md:hidden">

@@ -47,7 +47,7 @@ export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
               width={img.width}
               height={img.height}
               sizes="(max-width:768px) 50vw, (max-width:1280px) 33vw, 25vw"
-              className="h-auto w-full transition-transform duration-[1.2s] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-105"
+              className="h-auto w-full transition-transform duration-[1.2s] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.02]"
             />
             <span className="absolute inset-0 bg-night/0 transition-colors duration-500 group-hover:bg-night/20" />
           </motion.button>

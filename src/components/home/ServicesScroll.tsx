@@ -25,7 +25,7 @@ export default function ServicesScroll() {
 
   return (
     <section ref={ref} className="relative bg-ivory text-ink" style={{ height: `calc(100vh + ${dist}px)` }}>
-      <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden">
+      <div data-scroller className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden">
         <div className="mx-auto mb-10 flex w-full max-w-[1500px] items-end justify-between px-5 md:px-10">
           <div>
             <p className="text-xs uppercase tracking-[0.35em] text-kumkum"><Tracked text="(02) सेवाएँ" /></p>
@@ -46,7 +46,7 @@ export default function ServicesScroll() {
               data-cursor="Explore"
               className="group relative h-[58vh] w-[78vw] shrink-0 overflow-hidden bg-night text-ivory sm:w-[46vw] lg:w-[30vw]"
             >
-              <Image src={s.image} alt={s.en} fill sizes="(max-width:768px) 80vw, 30vw" className="object-cover transition-transform duration-[1.4s] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-110" />
+              <Image src={s.image} alt={s.en} fill sizes="(max-width:768px) 80vw, 30vw" quality={90} className="object-cover object-[50%_28%] transition-transform duration-[1.4s] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.04]" />
               <div className="absolute inset-0 bg-gradient-to-t from-night via-night/30 to-transparent" />
               <div className="absolute left-6 top-6 font-display text-lg text-gold">{String(i + 1).padStart(2, "0")}</div>
               {s.signature && (

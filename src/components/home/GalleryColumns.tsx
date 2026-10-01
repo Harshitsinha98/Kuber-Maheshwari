@@ -9,7 +9,7 @@ import Tracked from "@/components/site/Tracked";
 const cols = [
   ["kuber-02", "kuber-15", "kuber-33"],
   ["kuber-26", "kuber-09", "kuber-41", "kuber-18"],
-  ["kuber-35", "kuber-11", "kuber-43"],
+  ["kuber-35", "kuber-11", "kuber-06"],
   ["kuber-20", "kuber-23", "kuber-05", "kuber-30"],
 ];
 
@@ -47,7 +47,7 @@ export default function GalleryColumns() {
                     alt="Kuber Maheshwari"
                     fill
                     sizes="(max-width:768px) 50vw, 25vw"
-                    className="object-cover grayscale-[35%] transition-all duration-[1.2s] group-hover:scale-105 group-hover:grayscale-0"
+                    className="object-cover object-[50%_28%] transition-transform duration-[1.2s] group-hover:scale-[1.03]"
                   />
                 </Link>
               ))}

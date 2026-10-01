@@ -36,12 +36,12 @@ export default function Preloader() {
           >
             ॥ जय श्री राम ॥
           </motion.div>
-          <div className="mt-6 overflow-hidden">
+          <div className="mt-6 overflow-hidden px-2 py-[0.35em]">
             <motion.div
               initial={{ y: "110%" }}
               animate={{ y: 0 }}
               transition={{ duration: 1.1, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="font-hindi text-5xl text-ivory md:text-7xl"
+              className="font-hindi text-5xl leading-[1.45] text-ivory md:text-7xl"
             >
               कुबेर माहेश्वरी
             </motion.div>

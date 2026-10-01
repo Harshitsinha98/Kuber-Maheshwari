@@ -4,6 +4,7 @@ export default function Marquee({ reverse = false, tone = "saffron" }: { reverse
   const row = [...items, ...items];
   return (
     <div
+      data-scroller
       className={`relative overflow-hidden py-5 ${tone === "saffron" ? "bg-saffron text-night" : "border-y border-ivory/10 text-ivory"} ${
         reverse ? "-rotate-1" : "rotate-1"
       }`}

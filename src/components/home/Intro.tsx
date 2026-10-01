@@ -40,7 +40,7 @@ export default function Intro() {
       </div>
 
       <div className="mt-28 grid items-end gap-6 md:grid-cols-12">
-        <ParallaxImage src="/images/gallery/kuber-07.webp" alt="Kuber Maheshwari portrait" className="aspect-[4/5] md:col-span-5" />
+        <ParallaxImage src="/images/gallery/kuber-23.webp" alt="Kuber Maheshwari portrait" focus="55% 30%" className="aspect-[4/5] md:col-span-5" />
         <div className="md:col-span-4 md:col-start-7">
           <ParallaxImage src="/images/gallery/kuber-12.webp" alt="Kuber Maheshwari at the keyboard" className="aspect-square" strength={18} />
           <Reveal>

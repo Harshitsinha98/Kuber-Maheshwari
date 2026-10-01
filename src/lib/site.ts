@@ -65,7 +65,7 @@ export const services = [
     hi: "भक्ति फ्यूज़न",
     en: "Bhakti Fusion",
     desc: "Traditional bhajans in modern arrangements, mixing Indian roots with contemporary sounds.",
-    image: "/images/gallery/kuber-43.webp",
+    image: "/images/gallery/kuber-41.webp",
   },
   {
     slug: "jagran-kirtan",
@@ -79,7 +79,7 @@ export const services = [
     hi: "वैवाहिक एवं पारिवारिक आयोजन",
     en: "Weddings & Family Functions",
     desc: "Devotional and celebratory music for weddings and the family's special occasions.",
-    image: "/images/gallery/kuber-41.webp",
+    image: "/images/gallery/kuber-37.webp",
   },
   {
     slug: "studio",

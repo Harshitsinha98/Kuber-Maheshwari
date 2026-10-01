@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_IN",
     siteName: "Kuber Maheshwari",
-    images: [{ url: "/images/gallery/kuber-07.webp", width: 900, height: 900 }],
+    images: [{ url: "/images/gallery/kuber-25.webp", width: 1550, height: 1550 }],
   },
   twitter: { card: "summary_large_image" },
   alternates: { canonical: "/" },
