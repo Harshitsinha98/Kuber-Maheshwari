@@ -48,7 +48,7 @@ export default function Navbar() {
       <motion.header
         animate={{ y: hidden ? "-110%" : "0%" }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed inset-x-0 top-0 z-50 transition-colors duration-500 ${
+        className={`fixed inset-x-0 top-0 z-50 transition-colors duration-500 print:hidden ${
           solid && !open ? "bg-night/70 backdrop-blur-xl" : "bg-transparent"
         }`}
       >

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import Providers from "@/components/Providers";
+import ServiceWorker from "@/components/ServiceWorker";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -43,6 +44,7 @@ export const metadata: Metadata = {
   },
   twitter: { card: "summary_large_image" },
   alternates: { canonical: "/" },
+  appleWebApp: { capable: true, title: "Kuber Ji", statusBarStyle: "black-translucent" },
 };
 
 export const viewport: Viewport = { themeColor: "#0f0a0b" };
@@ -52,6 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="hi-IN" className={`${cormorant.variable} ${tiro.variable} ${manrope.variable} ${mukta.variable}`}>
       <body>
         <Providers>{children}</Providers>
+        <ServiceWorker />
       </body>
     </html>
   );

@@ -3,9 +3,9 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { qrDataUrl } from "@/lib/tickets";
 import { rupees } from "@/lib/format";
-import TicketCard from "@/components/events/TicketCard";
+import { loadPassView } from "@/lib/pass-view";
+import BookingTickets from "@/components/events/BookingTickets";
 import { Reveal, SplitText } from "@/components/motion/Reveal";
 
 export const dynamic = "force-dynamic";
@@ -17,23 +17,10 @@ export default async function BookingPage({ params, searchParams }: { params: Pr
   const s = await getSession();
   if (!s) redirect(`/login?callbackUrl=/bookings/${id}`);
 
-  const b = await prisma.booking.findUnique({
-    where: { id },
-    include: { event: true, ticketType: true, tickets: { orderBy: { seatLabel: "asc" } } },
-  });
-  if (!b || (b.userId !== s.user.id && s.user.role !== "ADMIN")) notFound();
-
-  const tickets = await Promise.all(
-    b.tickets.map(async (t) => ({
-      code: t.code,
-      qr: await qrDataUrl(t.code),
-      seatLabel: t.seatLabel,
-      type: b.ticketType.name,
-      name: b.attendeeName,
-      checkedInAt: t.checkedInAt,
-      event: b.event,
-    }))
-  );
+  const owner = await prisma.booking.findUnique({ where: { id }, select: { userId: true } });
+  if (!owner || (owner.userId !== s.user.id && s.user.role !== "ADMIN")) notFound();
+  const v = (await loadPassView(id))!;
+  const b = v.booking;
 
   return (
     <section className="mx-auto max-w-[1500px] px-5 pb-32 pt-36 md:px-10">
@@ -43,15 +30,18 @@ export default async function BookingPage({ params, searchParams }: { params: Pr
           <SplitText as="h1" immediate text={isNew ? "जय श्री राम! You're in." : "Your tickets"} className="mt-5 block font-display text-5xl md:text-7xl" />
           <Reveal delay={0.2}>
             <p className="mt-5 max-w-2xl text-lg text-ivory/70">
-              {b.quantity} × {b.ticketType.name} · {rupees(b.amount)}. A copy has been emailed to <span className="text-ivory">{b.attendeeEmail}</span>. Show each QR at the gate. Each QR admits one person, once.
+              {b.quantity} × {b.ticketType.name} · {rupees(b.amount)}
+              {b.emailSentAt ? (
+                <>
+                  . A copy has been emailed to <span className="text-ivory">{b.attendeeEmail}</span>.
+                </>
+              ) : (
+                ". Your tickets are always here under My Tickets."
+              )}
             </p>
           </Reveal>
-          <div className="mt-16 grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-            {tickets.map((t, i) => (
-              <Reveal key={t.code} delay={i * 0.1}>
-                <TicketCard t={t} />
-              </Reveal>
-            ))}
+          <div className="mt-14">
+            <BookingTickets v={v} />
           </div>
         </>
       ) : (

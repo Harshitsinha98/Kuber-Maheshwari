@@ -2,7 +2,7 @@ import { Resend } from "resend";
 import { prisma, safe } from "./prisma";
 import { site } from "./site";
 import { fmtDate, fmtTime, rupees } from "./format";
-import { qrPng, ticketUrl } from "./tickets";
+import { passQrPng, passUrl } from "./tickets";
 
 /**
  * Email via Resend. Everything switches on automatically once RESEND_API_KEY is set.
@@ -102,38 +102,34 @@ const loadBooking = (id: string) =>
 export async function sendTicketEmail(bookingId: string): Promise<SendResult> {
   const b = await loadBooking(bookingId);
 
-  const attachments = await Promise.all(
-    b.tickets.map(async (t, i) => ({ filename: `ticket-${i + 1}-${t.code}.png`, content: await qrPng(t.code), contentId: `qr-${t.code}` }))
-  );
-
-  const tickets = b.tickets
-    .map(
-      (t) => `<table width="100%" style="border:1px dashed #c9a227;margin:14px 0"><tr>
-<td style="padding:14px;width:150px"><img src="cid:qr-${t.code}" width="150" height="150" alt="QR ${t.code}" style="display:block"/></td>
-<td style="padding:14px;vertical-align:top"><div style="font-size:12px;color:#7a6a55">TICKET ${esc(t.seatLabel)}</div>
-<div style="font-size:18px;font-weight:bold;letter-spacing:2px">${t.code}</div>
-<div style="margin-top:6px">${esc(b.ticketType.name)}</div>
-<a href="${ticketUrl(t.code)}" style="display:inline-block;margin-top:10px;color:#8b1e2d">Open ticket →</a></td></tr></table>`
-    )
-    .join("");
+  const n = b.tickets.length;
+  const link = passUrl(b.id);
+  // One QR for the whole booking; the gate admits as many of the n tickets as are entering.
+  const attachments = [{ filename: `ticket-${b.id.slice(-8)}.png`, content: await passQrPng(b.id), contentId: "km-pass" }];
 
   const when = `${fmtDate(b.event.startsAt)} · ${fmtTime(b.event.startsAt)}`;
   const where = `${b.event.venueName}, ${b.event.address}, ${b.event.city}`;
   const html = shell(`<p>नमस्ते ${esc(b.attendeeName)} ji,</p>
-<p>Your booking is confirmed. Show the QR code below at the entry gate. Each QR admits one person, once.</p>
+<p>Your booking is confirmed. ${
+    n > 1 ? `<b>This one QR is for all ${n} people.</b> At the gate, the staff will let in as many of you as are arriving. Each ticket can enter only once.` : "Show this QR at the entry gate. It admits one person, once."
+  }</p>
 <h2 style="font-family:Georgia,serif;margin:18px 0 4px">${esc(b.event.title)}</h2>
 <div>${when}</div>
 <div>${esc(where)}</div>
 <div style="margin-top:8px;color:#7a6a55">${b.quantity} × ${esc(b.ticketType.name)} · ${rupees(b.amount)} · Booking ${b.id.slice(-8).toUpperCase()}</div>
-${tickets}
-<p style="color:#7a6a55;font-size:12px">You can also see your tickets anytime at <a href="${site.url}/my-tickets">${site.url}/my-tickets</a></p>`);
+<table width="100%" style="border:1px dashed #c9a227;margin:18px 0"><tr>
+<td align="center" style="padding:20px"><img src="cid:km-pass" width="240" height="240" alt="Ticket QR" style="display:block"/>
+<div style="margin-top:10px;font-weight:bold">${n > 1 ? `Admits ${n}` : "Admits 1"} · ${esc(b.ticketType.name)}</div></td></tr></table>
+<p><a href="${link}" style="display:inline-block;background:#e8820c;color:#140d0e;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:bold">Open ticket · Save to phone / Wallet</a></p>
+${n > 1 ? `<p style="color:#7a6a55;font-size:12px">Coming separately? Open the ticket and tap “Need separate QRs?” to send each person their own QR.</p>` : ""}
+<p style="color:#7a6a55;font-size:12px">All your tickets: <a href="${site.url}/my-tickets">${site.url}/my-tickets</a></p>`);
 
   const text = [
     `Namaste ${b.attendeeName} ji,`,
     `Your booking for ${b.event.title} is confirmed.`,
     `${when}\n${where}`,
-    `${b.quantity} x ${b.ticketType.name} (${rupees(b.amount)})`,
-    ...b.tickets.map((t) => `Ticket ${t.seatLabel}: ${t.code}  ${ticketUrl(t.code)}`),
+    `${b.quantity} x ${b.ticketType.name} (${rupees(b.amount)})${n > 1 ? ` - one QR admits all ${n}` : ""}`,
+    `Your ticket: ${link}`,
     `All tickets: ${site.url}/my-tickets`,
   ].join("\n\n");
 
@@ -168,8 +164,7 @@ export async function sendReminderEmail(bookingId: string): Promise<SendResult> 
     `${b.event.venueName}, ${b.event.address}, ${b.event.city}`
   )}</p>
 <p><a href="${b.event.mapUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${b.event.venueName}, ${b.event.address}, ${b.event.city}`)}`}" style="color:#8b1e2d">Get directions →</a></p>
-<p>Your ${b.tickets.length > 1 ? `${b.tickets.length} tickets` : "ticket"}:</p>
-<ul>${b.tickets.map((t) => `<li><a href="${ticketUrl(t.code)}" style="color:#8b1e2d">Ticket ${esc(t.seatLabel)} · ${t.code}</a></li>`).join("")}</ul>
+<p><a href="${passUrl(b.id)}" style="display:inline-block;background:#e8820c;color:#140d0e;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:bold">Open your ticket${b.tickets.length > 1 ? ` (admits ${b.tickets.length})` : ""}</a></p>
 <p style="color:#7a6a55;font-size:12px">Please keep the QR ready on your phone at the gate.</p>`);
   return sendMail({ to: b.attendeeEmail, subject: `⏰ Tomorrow: ${b.event.title}`, html });
 }

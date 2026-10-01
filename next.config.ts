@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // Default is 1 MB. Photos are compressed in the browser first; 4 MB stays under Vercel's 4.5 MB cap.
   experimental: { serverActions: { bodySizeLimit: "4mb" } },
+  // The Apple Wallet route reads the logo from disk to build pass icons.
+  outputFileTracingIncludes: { "/api/tickets/[id]/apple-wallet": ["./public/images/brand/km-logo.png"] },
   images: {
     formats: ["image/avif", "image/webp"],
     qualities: [75, 90],

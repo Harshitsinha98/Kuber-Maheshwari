@@ -6,7 +6,7 @@ import Tracked from "@/components/site/Tracked";
 
 export default function Footer() {
   return (
-    <footer className="relative overflow-hidden border-t border-ivory/10 bg-night pt-24">
+    <footer className="relative overflow-hidden print:hidden border-t border-ivory/10 bg-night pt-24">
       <div className="mx-auto max-w-[1500px] px-5 md:px-10">
         <div className="grid gap-16 lg:grid-cols-[1.4fr_1fr]">
           <div>

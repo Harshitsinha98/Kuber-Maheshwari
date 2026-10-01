@@ -73,6 +73,31 @@ Until keys are added, paid ticket types show "Online booking opening soon" and f
 
 Also set `NEXT_PUBLIC_INSTAGRAM_URL`, `NEXT_PUBLIC_FACEBOOK_URL`, `NEXT_PUBLIC_YOUTUBE_URL` for the follow buttons.
 
+## Tickets: one QR per booking
+- A booking of N tickets gets **one group QR** (`KM2…`, signed). At the gate the scanner shows *"N tickets · X in · Y left"* and staff choose how many are entering now. Each ticket still enters only once, even with several gates scanning at the same moment.
+- "Need separate QRs?" on the ticket page shows one QR per ticket (`KM1…`) for people arriving separately. Both kinds point to the same tickets, so nothing can be used twice.
+- Saving: Save as image, Print/PDF, Share (WhatsApp), Add to calendar (.ics), installable app with **offline tickets**, and Google/Apple Wallet once configured.
+
+## Wallet passes (optional)
+The "Add to Google Wallet" / "Add to Apple Wallet" buttons appear automatically once these are set in Vercel (then redeploy).
+
+**Google Wallet (free)**
+1. [pay.google.com/business/console](https://pay.google.com/business/console) → Google Wallet API → note the **Issuer ID** → `GOOGLE_WALLET_ISSUER_ID`.
+2. Google Cloud Console → enable **Google Wallet API** → IAM → Service accounts → create one → Keys → Add key (JSON).
+3. In the Wallet console → Users, invite the service-account email as **Developer**.
+4. Paste the whole JSON key into `GOOGLE_WALLET_SERVICE_ACCOUNT`.
+5. Until Google approves the issuer for production, passes only save for test accounts added in the console; request publishing access there.
+
+**Apple Wallet ($99/year Apple Developer Program)**
+1. developer.apple.com → Certificates, IDs & Profiles → Identifiers → **Pass Type IDs** → e.g. `pass.com.kubermaheshwari.ticket` → `APPLE_PASS_TYPE_ID`. Your Team ID (top right) → `APPLE_TEAM_ID`.
+2. Create a **Pass Type ID certificate** for it, download the `.cer`, open in Keychain, export as `.p12`, then:
+   ```bash
+   openssl pkcs12 -in pass.p12 -clcerts -nokeys -out pass-cert.pem -legacy
+   openssl pkcs12 -in pass.p12 -nocerts -out pass-key.pem -legacy   # sets a passphrase
+   ```
+3. Download Apple's **WWDR G4** certificate and convert: `openssl x509 -inform der -in AppleWWDRCAG4.cer -out wwdr.pem`.
+4. Paste the PEM contents into `APPLE_PASS_CERT`, `APPLE_PASS_KEY`, `APPLE_WWDR_CERT`, and the passphrase into `APPLE_PASS_KEY_PASSPHRASE`.
+
 ## Event-day workflow
 1. Admin → Events → create event, add ticket types (price ₹0 = free pass) → set **Published**.
 2. Buyers get QR tickets by email and under *My Tickets*.

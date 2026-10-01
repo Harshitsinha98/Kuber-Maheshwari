@@ -115,6 +115,13 @@ select.field option { background: var(--color-night-2); }
 }
 .admin-input:focus { outline: 2px solid #e8820c55; border-color: #e8820c; }
 
+/* Printing a ticket: just the ticket, on white paper */
+@media print {
+  html, body { background: #fff !important; color: #1d1416 !important; }
+  main section { padding-top: 0 !important; padding-bottom: 0 !important; }
+  [data-ticket-card] { break-inside: avoid; box-shadow: none !important; border: 1px solid #d9c9a8; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .marquee, .gold-text { animation: none; }
 }
