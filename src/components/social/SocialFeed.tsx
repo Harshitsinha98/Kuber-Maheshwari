@@ -103,7 +103,7 @@ function FollowButton({ href, label, profile, icon }: { href: string; label: str
 function EmptyFeed({ kind, href }: { kind: string; href: string }) {
   return (
     <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-      {["kuber-03", "kuber-45", "kuber-37", "kuber-21"].map((n) => (
+      {["kuber-03", "kuber-46", "kuber-28", "kuber-21"].map((n) => (
         <a key={n} href={href} target="_blank" rel="noopener" className="group relative block aspect-square overflow-hidden">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={`/images/gallery/${n}.webp`} alt="" className="h-full w-full object-cover opacity-70 transition group-hover:opacity-100" />

@@ -17,9 +17,29 @@ const legacyDir = "assets/original-photos";
 const hqDir = "assets/hq-photos";
 const outDir = path.join("public", "images", "gallery");
 // kuber-13 and kuber-22 are logo artwork (used as the site logo), not gallery photos.
-const SKIP = new Set(["kuber-13", "kuber-22"]);
-// Newest HQ photos are shown first in the gallery.
-const FEATURED_FIRST = ["kuber-44", "kuber-47", "kuber-25", "kuber-48", "kuber-46", "kuber-03", "kuber-45", "kuber-15"];
+// The rest are near-duplicates of a sharper photo that is kept (kept one in brackets),
+// so the gallery doesn't show the same moment again and again.
+const SKIP = new Set([
+  "kuber-13", "kuber-22",
+  "kuber-01", "kuber-05", "kuber-45", // stage namaste with bubbles [kuber-44]
+  "kuber-26", "kuber-33", // temple, arms open [kuber-48]
+  "kuber-30", "kuber-38", // temple namaste [kuber-27]
+  "kuber-11", // hilltop, sitting on rocks [kuber-23]
+  "kuber-17", // balcony by the sea [kuber-16]
+  "kuber-20", // harmonium + mic, same moment [kuber-25]
+  "kuber-35", "kuber-37", // floral shirt with mic [kuber-39]
+  "kuber-29", // smiling close-up, B&W copy [kuber-19]
+  "kuber-36", // white kurta + orange scarf close-up [kuber-07]
+]);
+// Gallery order (the grid fills row by row). Similar scenes are 5 places apart, e.g. night stage
+// shots at 0,5,10… and white-kurta portraits at 2,7,12…, so they never share a column
+// in the 2-, 3- or 4-column layouts. Unlisted photos (new uploads) go last.
+const ORDER = [
+  "kuber-44", "kuber-25", "kuber-48", "kuber-39", "kuber-07", "kuber-47", "kuber-16", "kuber-15",
+  "kuber-12", "kuber-41", "kuber-46", "kuber-19", "kuber-06", "kuber-28", "kuber-21", "kuber-03",
+  "kuber-14", "kuber-23", "kuber-43", "kuber-09", "kuber-02", "kuber-08", "kuber-18", "kuber-42",
+  "kuber-10", "kuber-04", "kuber-40", "kuber-27", "kuber-34", "kuber-31", "kuber-32", "kuber-24",
+];
 fs.mkdirSync(outDir, { recursive: true });
 
 const isImg = (f) => /\.(jpe?g|png|webp)$/i.test(f);
@@ -57,7 +77,7 @@ for (const [base, { file, max }] of [...sources].sort(([a], [b]) => a.localeComp
   });
 }
 
-const rank = (b) => (FEATURED_FIRST.includes(b) ? FEATURED_FIRST.indexOf(b) : FEATURED_FIRST.length);
+const rank = (b) => (ORDER.includes(b) ? ORDER.indexOf(b) : ORDER.length);
 const manifest = built
   .map((m, i) => ({ ...m, i }))
   .sort((a, b) => rank(a.base) - rank(b.base) || a.i - b.i)

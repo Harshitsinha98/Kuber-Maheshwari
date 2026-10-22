@@ -12,7 +12,7 @@ const links = [
   { href: "/", label: "Home", hi: "मुख्य", img: "/images/gallery/kuber-25.webp" },
   { href: "/about", label: "About", hi: "परिचय", img: "/images/gallery/kuber-07.webp" },
   { href: "/services", label: "Services", hi: "सेवाएँ", img: "/images/gallery/kuber-06.webp" },
-  { href: "/events", label: "Events", hi: "कार्यक्रम", img: "/images/gallery/kuber-45.webp" },
+  { href: "/events", label: "Events", hi: "कार्यक्रम", img: "/images/gallery/kuber-46.webp" },
   { href: "/gallery", label: "Gallery", hi: "झलकियाँ", img: "/images/gallery/kuber-15.webp" },
   { href: "/videos", label: "Videos", hi: "वीडियो", img: "/images/gallery/kuber-41.webp" },
   { href: "/booking", label: "Book Kuber Ji", hi: "आमंत्रण", img: "/images/gallery/kuber-48.webp" },
