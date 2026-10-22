@@ -9,10 +9,10 @@ import { photo } from "@/lib/photos";
 
 // Mostly the high-resolution camera photos (kuber-44+ and the upgraded ones).
 const cols = [
-  ["kuber-02", "kuber-15", "kuber-33"],
+  ["kuber-02", "kuber-15", "kuber-12"],
   ["kuber-48", "kuber-44", "kuber-41", "kuber-18"],
-  ["kuber-47", "kuber-11", "kuber-06"],
-  ["kuber-20", "kuber-23", "kuber-46", "kuber-39"],
+  ["kuber-47", "kuber-28", "kuber-06"],
+  ["kuber-14", "kuber-23", "kuber-46", "kuber-39"],
 ];
 
 export default function GalleryColumns() {

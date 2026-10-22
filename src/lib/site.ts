@@ -79,7 +79,7 @@ export const services = [
     hi: "वैवाहिक एवं पारिवारिक आयोजन",
     en: "Weddings & Family Functions",
     desc: "Devotional and celebratory music for weddings and the family's special occasions.",
-    image: "/images/gallery/kuber-37.webp",
+    image: "/images/gallery/kuber-28.webp",
   },
   {
     slug: "studio",

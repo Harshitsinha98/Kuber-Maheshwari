@@ -5,6 +5,45 @@ import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import type { GalleryImage } from "@/lib/queries";
 
+const LAYOUTS = [
+  { cols: 2, className: "flex md:hidden" },
+  { cols: 3, className: "hidden md:flex xl:hidden" },
+  { cols: 4, className: "hidden xl:flex" },
+];
+
+/** Deal photo indexes into columns row by row: 0,1,2,3 on the first row, and so on. */
+const spread = (n: number, cols: number) =>
+  Array.from({ length: cols }, (_, c) => Array.from({ length: Math.ceil((n - c) / cols) }, (_, r) => r * cols + c));
+
+function Tile({ img, i, onOpen }: { img: GalleryImage; i: number; onOpen: (i: number) => void }) {
+  return (
+    <motion.button
+      type="button"
+      onClick={() => onOpen(i)}
+      data-cursor="View"
+      initial={{ opacity: 0, y: 60 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-5% 0px" }}
+      transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: (i % 4) * 0.06 }}
+      className="group relative block w-full overflow-hidden"
+    >
+      <Image
+        src={img.src}
+        alt={img.caption || "Kuber Maheshwari"}
+        width={img.width}
+        height={img.height}
+        sizes="(max-width:768px) 50vw, (max-width:1280px) 33vw, 25vw"
+        {...(img.blur ? { placeholder: "blur" as const, blurDataURL: img.blur } : {})}
+        className="h-auto w-full transition-transform duration-[1.2s] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.03]"
+      />
+      <span className="absolute inset-0 bg-gradient-to-t from-night/60 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+      <span className="absolute bottom-3 left-3 translate-y-2 text-[10px] uppercase tracking-[0.3em] text-ivory opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+        {img.caption || "View"} ↗
+      </span>
+    </motion.button>
+  );
+}
+
 export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
   const [open, setOpen] = useState<number | null>(null);
   const close = useCallback(() => setOpen(null), []);
@@ -28,35 +67,20 @@ export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
 
   return (
     <>
-      <div className="columns-2 gap-3 md:columns-3 md:gap-5 xl:columns-4">
-        {images.map((img, i) => (
-          <motion.button
-            key={img.src}
-            type="button"
-            onClick={() => setOpen(i)}
-            data-cursor="View"
-            initial={{ opacity: 0, y: 60 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-5% 0px" }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: (i % 4) * 0.06 }}
-            className="group relative mb-3 block w-full overflow-hidden md:mb-5"
-          >
-            <Image
-              src={img.src}
-              alt={img.caption || "Kuber Maheshwari"}
-              width={img.width}
-              height={img.height}
-              sizes="(max-width:768px) 50vw, (max-width:1280px) 33vw, 25vw"
-              {...(img.blur ? { placeholder: "blur" as const, blurDataURL: img.blur } : {})}
-              className="h-auto w-full transition-transform duration-[1.2s] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.03]"
-            />
-            <span className="absolute inset-0 bg-gradient-to-t from-night/60 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-            <span className="absolute bottom-3 left-3 translate-y-2 text-[10px] uppercase tracking-[0.3em] text-ivory opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
-              {img.caption || "View"} ↗
-            </span>
-          </motion.button>
-        ))}
-      </div>
+      {/* One layout per breakpoint so photos fill left-to-right in gallery order
+          (CSS columns would stack consecutive, similar photos in one column).
+          Hidden layouts cost nothing: lazy images inside display:none never load. */}
+      {LAYOUTS.map((l) => (
+        <div key={l.cols} className={`${l.className} gap-3 md:gap-5`}>
+          {spread(images.length, l.cols).map((col, c) => (
+            <div key={c} className="flex min-w-0 flex-1 flex-col gap-3 md:gap-5">
+              {col.map((i) => (
+                <Tile key={images[i].src} img={images[i]} i={i} onOpen={setOpen} />
+              ))}
+            </div>
+          ))}
+        </div>
+      ))}
 
       <AnimatePresence>
         {open !== null && (

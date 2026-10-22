@@ -143,7 +143,7 @@ export default async function Booking({ searchParams }: { searchParams: Promise<
           <Reveal>
             <div className="relative overflow-hidden rounded-[28px] ring-1 ring-gold/25">
               <div className="relative aspect-[3/2]">
-                <Image src="/images/gallery/kuber-37.webp" alt="Kuber Maheshwari singing" fill quality={90} sizes="(max-width:1024px) 90vw, 560px" className="object-cover object-[45%_30%]" />
+                <Image src="/images/gallery/kuber-39.webp" alt="Kuber Maheshwari singing" fill quality={90} sizes="(max-width:1024px) 90vw, 560px" className="object-cover object-[50%_25%]" />
                 <div className="absolute inset-0 bg-gradient-to-t from-night via-night/30 to-transparent" />
                 <p className="absolute bottom-4 left-5 font-hindi text-2xl text-ivory">सीधे बात करें</p>
               </div>
