@@ -67,7 +67,7 @@ export default async function EventPage({ params }: Props) {
     <article>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="relative h-[78vh] min-h-[520px] overflow-hidden">
-        <Image src={e.posterUrl || "/images/gallery/kuber-25.webp"} alt={e.title} fill priority quality={90} sizes="100vw" className="object-cover object-[50%_30%]" />
+        <Image src={e.posterUrl || "/images/gallery/kuber-25.webp"} alt={e.title} fill priority quality={90} sizes="100vw" className="object-cover object-[50%_22%]" />
         <div className="absolute inset-0 bg-gradient-to-t from-night via-night/60 to-night/20" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#3a0b12]/70 to-transparent" />
         <div className="toran absolute inset-x-0 top-20 z-10 md:top-24" aria-hidden />

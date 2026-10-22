@@ -91,7 +91,7 @@ export default function EventForm({ id, d }: { id: string | null; d: EventDefaul
           <input name="posterFile" type="file" accept="image/*" className="admin-input" />
         </L>
         <L label="…or poster image URL">
-          <input name="posterUrl" defaultValue={d.posterUrl} className="admin-input" placeholder="/images/gallery/kuber-01.webp" />
+          <input name="posterUrl" defaultValue={d.posterUrl} className="admin-input" placeholder="/images/gallery/kuber-44.webp" />
         </L>
       </div>
 

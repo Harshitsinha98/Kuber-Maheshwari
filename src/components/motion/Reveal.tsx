@@ -3,6 +3,7 @@
 import { motion, useInView, useMotionValue, useScroll, useSpring, useTransform, animate } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, type ReactNode } from "react";
+import { blurFor } from "@/lib/photos";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -126,6 +127,7 @@ export function ParallaxImage({
   focus?: string;
   sizes?: string;
 }) {
+  const blur = blurFor(src);
   return (
     <motion.div
       className={`relative overflow-hidden ${className ?? ""}`}
@@ -134,7 +136,7 @@ export function ParallaxImage({
       viewport={{ once: true, margin: "-10% 0px" }}
       transition={{ duration: 1.4, ease }}
     >
-      <Image src={src} alt={alt} fill sizes={sizes} quality={90} className="object-cover" style={{ objectPosition: focus }} priority={priority} />
+      <Image src={src} alt={alt} fill sizes={sizes} quality={90} className="object-cover" style={{ objectPosition: focus }} priority={priority} {...(blur ? { placeholder: "blur" as const, blurDataURL: blur } : {})} />
     </motion.div>
   );
 }

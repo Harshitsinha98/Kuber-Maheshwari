@@ -116,14 +116,14 @@ export async function seatsLeftForEvent(eventId: string, types: { id: string; ca
   return new Map(types.map((t) => [t.id, Math.max(0, t.capacity - (used.get(t.id) || 0))]));
 }
 
-export type GalleryImage = { id?: string; src: string; width: number; height: number; caption?: string | null };
+export type GalleryImage = { id?: string; src: string; width: number; height: number; caption?: string | null; blur?: string };
 
 /** Admin-uploaded images first, then the original photo set. */
 export async function getGallery(): Promise<GalleryImage[]> {
   const uploaded = await safe(() => prisma.galleryItem.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }] }), []);
   return [
     ...uploaded.map((g) => ({ id: g.id, src: g.url, width: g.width || 1200, height: g.height || 1500, caption: g.caption })),
-    ...galleryFallback.map((g) => ({ src: g.src, width: g.width, height: g.height })),
+    ...galleryFallback.map((g) => ({ src: g.src, width: g.width, height: g.height, blur: g.blur })),
   ];
 }
 

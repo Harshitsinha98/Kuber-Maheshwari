@@ -58,7 +58,7 @@ export const services = [
     hi: "भजन क्लबिंग",
     en: "Bhajan Clubbing",
     desc: "Devotion with concert energy: big sound, lights and a crowd that sings and dances along. Made for youth festivals and big stages.",
-    image: "/images/gallery/kuber-01.webp",
+    image: "/images/gallery/kuber-47.webp",
   },
   {
     slug: "bhakti-fusion",
