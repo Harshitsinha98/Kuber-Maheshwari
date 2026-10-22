@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
 import { Magnetic } from "@/components/motion/Reveal";
+import { photo } from "@/lib/photos";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 const ramp = (v: number, a: number, b: number) => Math.min(1, Math.max(0, (v - a) / (b - a)));
@@ -90,15 +91,15 @@ export default function Hero() {
           transition={{ duration: 1.6, ease, delay: 0.15 }}
           className="relative z-[5] mt-[4vh] overflow-hidden md:mt-[10vh]"
         >
-          {/* 1550×1550 original: stays sharp even when the frame opens to full screen. */}
+          {/* 2046×2400 camera original: stays sharp even when the frame opens to full screen. */}
           <Image
-            src="/images/gallery/kuber-25.webp"
+            {...photo("kuber-25")}
             alt="Kuber Maheshwari singing live"
             fill
             priority
             quality={90}
             sizes="100vw"
-            className="object-cover object-[45%_32%]"
+            className="object-cover object-[48%_20%]"
           />
           <motion.div style={{ opacity: overlay }} className="absolute inset-0 bg-night" />
           <div className="absolute inset-0 bg-gradient-to-t from-night/70 via-transparent to-transparent" />

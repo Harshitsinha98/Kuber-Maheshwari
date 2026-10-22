@@ -10,7 +10,7 @@ import { ArrowIcon } from "@/components/site/Icons";
 
 const FALLBACK = "/images/gallery/kuber-25.webp";
 // Different stage photos for events without their own poster, so cards don't repeat.
-const CARD_FALLBACKS = ["/images/gallery/kuber-41.webp", "/images/gallery/kuber-37.webp", "/images/gallery/kuber-23.webp", "/images/gallery/kuber-06.webp", "/images/gallery/kuber-35.webp"];
+const CARD_FALLBACKS = ["/images/gallery/kuber-47.webp", "/images/gallery/kuber-41.webp", "/images/gallery/kuber-44.webp", "/images/gallery/kuber-23.webp", "/images/gallery/kuber-46.webp"];
 const ease = [0.16, 1, 0.3, 1] as const;
 
 const priceHi = (e: EventCard) =>

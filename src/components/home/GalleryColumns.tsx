@@ -5,12 +5,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
 import Tracked from "@/components/site/Tracked";
+import { photo } from "@/lib/photos";
 
+// Mostly the high-resolution camera photos (kuber-44+ and the upgraded ones).
 const cols = [
   ["kuber-02", "kuber-15", "kuber-33"],
-  ["kuber-26", "kuber-09", "kuber-41", "kuber-18"],
-  ["kuber-35", "kuber-11", "kuber-06"],
-  ["kuber-20", "kuber-23", "kuber-05", "kuber-30"],
+  ["kuber-48", "kuber-44", "kuber-41", "kuber-18"],
+  ["kuber-47", "kuber-11", "kuber-06"],
+  ["kuber-20", "kuber-23", "kuber-46", "kuber-39"],
 ];
 
 export default function GalleryColumns() {
@@ -42,7 +44,7 @@ export default function GalleryColumns() {
               {c.map((n) => (
                 <Link key={n} href="/gallery" data-cursor="View" className="group relative aspect-[3/4] overflow-hidden">
                   <Image
-                    src={`/images/gallery/${n}.webp`}
+                    {...photo(n)}
                     alt="Kuber Maheshwari"
                     fill
                     sizes="(max-width:768px) 50vw, 25vw"

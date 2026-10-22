@@ -23,7 +23,7 @@ if (!(await prisma.event.findUnique({ where: { slug } }))) {
       venueName: "Demo Venue",
       address: "Vijay Nagar",
       city: "Indore",
-      posterUrl: "/images/gallery/kuber-01.webp",
+      posterUrl: "/images/gallery/kuber-44.webp",
       status: "DRAFT",
       ticketTypes: {
         create: [

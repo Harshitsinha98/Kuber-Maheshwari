@@ -31,7 +31,7 @@ export default function LiveVideo() {
         <video
           ref={video}
           src="/videos/kuber-live.mp4"
-          poster="/images/gallery/kuber-01.webp"
+          poster="/images/gallery/kuber-44.webp"
           muted={!sound}
           loop
           playsInline

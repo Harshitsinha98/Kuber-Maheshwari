@@ -122,3 +122,13 @@ See [`.env.example`](.env.example). Every secret stays on the server; nothing se
 - **Supabase, Resend, Vercel Blob:** free tiers are enough to launch.
 - **Razorpay:** standard per-transaction fee, only on paid tickets.
 - **Domain:** yearly renewal.
+
+### Built-in photos
+
+Source photos live in `assets/` (they are not served directly). `node scripts/optimize-images.mjs` rebuilds `public/images/gallery/*.webp` and `src/data/gallery.json` (sizes and blur previews):
+
+- `assets/original-photos/`: first WhatsApp set, numbered `kuber-01…` by filename order.
+- `assets/hq-photos/kuber-NN.jpg`: high-quality camera originals. Using an existing number replaces that photo everywhere on the site; a new number adds a new photo.
+- `assets/brand/km-logo-source.jpg`: high-res logo that `public/images/brand/km-logo.png` was cut from.
+
+Don't put raw camera photos in `public/`: everything there ships with the site.
