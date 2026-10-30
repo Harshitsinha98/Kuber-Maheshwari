@@ -33,6 +33,8 @@ export const site = {
 export const waLink = (text = "नमस्ते कुबेर जी, मुझे एक आयोजन के लिए जानकारी चाहिए।", i = 0) =>
   `https://wa.me/${site.phones[i].wa}?text=${encodeURIComponent(text)}`;
 
+// Six visually different, high-resolution photos (2000px+), so no two services look alike.
+// `focus` is the CSS object-position that keeps his face in frame when cropped.
 export const services = [
   {
     slug: "sundarkand",
@@ -40,7 +42,8 @@ export const services = [
     en: "Musical Sundarkand",
     note: "भावार्थ सहित",
     desc: "Shri Sundarkand as a live musical presentation, with the meaning (bhavarth) explained so every devotee understands, not just listens.",
-    image: "/images/gallery/kuber-06.webp",
+    image: "/images/gallery/kuber-40.webp",
+    focus: "50% 62%",
     signature: true,
   },
   {
@@ -48,21 +51,24 @@ export const services = [
     hi: "भजन संध्या",
     en: "Bhajan Sandhya",
     desc: "An evening of classic and new bhajans, sung live, for temples, societies and family gatherings.",
-    image: "/images/gallery/kuber-04.webp",
+    image: "/images/gallery/kuber-25.webp",
+    focus: "48% 22%",
   },
   {
     slug: "bhajan-clubbing",
     hi: "भजन क्लबिंग",
     en: "Bhajan Clubbing",
     desc: "Devotion with concert energy: big sound, lights and a crowd that sings and dances along. Made for youth festivals and big stages.",
-    image: "/images/gallery/kuber-47.webp",
+    image: "/images/gallery/kuber-02.webp",
+    focus: "42% 22%",
   },
   {
     slug: "bhakti-fusion",
     hi: "भक्ति फ्यूज़न",
     en: "Bhakti Fusion",
     desc: "Traditional bhajans in modern arrangements, mixing Indian roots with contemporary sounds.",
-    image: "/images/gallery/kuber-41.webp",
+    image: "/images/gallery/kuber-39.webp",
+    focus: "50% 18%",
   },
   {
     slug: "jagran-kirtan",
@@ -70,6 +76,7 @@ export const services = [
     en: "Jagran & Kirtan",
     desc: "All-night jagrans and Shyam kirtans, performed with the discipline and bhaav of the tradition.",
     image: "/images/gallery/kuber-14.webp",
+    focus: "50% 35%",
   },
   {
     slug: "weddings",
@@ -77,6 +84,7 @@ export const services = [
     en: "Weddings & Family Functions",
     desc: "Devotional and celebratory music for weddings and the family's special occasions.",
     image: "/images/gallery/kuber-28.webp",
+    focus: "45% 18%",
   },
 ];
 
