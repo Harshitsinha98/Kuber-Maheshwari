@@ -69,7 +69,7 @@ export default async function AdminWhatsapp() {
               <code>whatsapp_business_management</code>, no expiry.
             </li>
             <li>
-              In Vercel add <code>WHATSAPP_TOKEN</code>, <code>WHATSAPP_PHONE_NUMBER_ID</code> (from API Setup) and <code>WHATSAPP_NOTIFY_TO</code> (e.g. <code>9827751400,9425331165</code>), then <b>Redeploy</b>.
+              In Vercel add <code>WHATSAPP_TOKEN</code>, <code>WHATSAPP_PHONE_NUMBER_ID</code> (from API Setup) and <code>WHATSAPP_NOTIFY_TO</code> (e.g. <code>9827751400</code>), then <b>Redeploy</b>.
             </li>
             <li>Come back here and send a test.</li>
           </ol>

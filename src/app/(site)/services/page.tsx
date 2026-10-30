@@ -7,7 +7,7 @@ import { services, waLink } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Services: Sundarkand, Bhajan Sandhya, Bhajan Clubbing, Bhakti Fusion",
   description:
-    "Book Kuber Maheshwari for Musical Sundarkand with bhavarth, Bhajan Sandhya, Bhajan Clubbing, Bhakti Fusion, Mata Jagran, Shyam Kirtan, weddings and studio recording in Indore and across India.",
+    "Book Kuber Maheshwari for Musical Sundarkand with bhavarth, Bhajan Sandhya, Bhajan Clubbing, Bhakti Fusion, Mata Jagran, Shyam Kirtan, weddings and family functions in Indore and across India.",
 };
 
 export default function Services() {
