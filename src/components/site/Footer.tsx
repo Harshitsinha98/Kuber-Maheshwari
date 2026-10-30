@@ -68,7 +68,6 @@ export default function Footer() {
                   </li>
                 ))}
                 <li className="pt-2 text-muted">{site.city}</li>
-                <li className="text-muted">{site.studio}</li>
               </ul>
               <div className="mt-6 flex gap-3">
                 {[
@@ -102,7 +101,7 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col items-center justify-between gap-3 border-t border-ivory/10 py-8 pb-24 text-xs text-muted md:flex-row md:pb-8 md:pr-24">
-          <span>© {new Date().getFullYear()} Kuber Maheshwari · {site.studio}</span>
+          <span>© {new Date().getFullYear()} Kuber Maheshwari</span>
           <span className="font-hindi">॥ सियावर रामचन्द्र की जय ॥</span>
         </div>
       </div>

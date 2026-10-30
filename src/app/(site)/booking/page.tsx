@@ -75,7 +75,7 @@ export default async function Booking({ searchParams }: { searchParams: Promise<
             <div className="absolute -inset-6 rounded-t-full bg-[radial-gradient(closest-side,rgba(232,130,12,0.45),transparent)] blur-2xl" aria-hidden />
             <div className="relative overflow-hidden rounded-t-full border-[3px] border-gold/70 p-2 shadow-[0_40px_120px_-30px_rgba(232,130,12,0.6)]">
               <div className="relative aspect-[4/5] overflow-hidden rounded-t-full">
-                <Image src="/images/gallery/kuber-06.webp" alt="Kuber Maheshwari, namaste" fill priority quality={90} sizes="(max-width:1024px) 90vw, 460px" className="object-cover object-[50%_20%]" />
+                <Image src="/images/gallery/kuber-25.webp" alt="Kuber Maheshwari singing live" fill priority quality={90} sizes="(max-width:1024px) 90vw, 460px" className="object-cover object-[48%_20%]" />
                 <div className="absolute inset-0 bg-gradient-to-t from-night/70 via-transparent" />
               </div>
             </div>

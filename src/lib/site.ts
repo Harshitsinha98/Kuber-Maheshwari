@@ -2,19 +2,17 @@ export const site = {
   name: "Kuber Maheshwari",
   nameHi: "कुबेर माहेश्वरी",
   legalName: "Ankit Maheshwari",
-  studio: "K M Audio Productions",
   tagline: "Bhajan · Sundarkand · Bhakti Fusion",
   city: "Indore, Madhya Pradesh",
   url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
   phones: [
     { display: "+91 98277 51400", tel: "+919827751400", wa: "919827751400" },
-    { display: "+91 94253 31165", tel: "+919425331165", wa: "919425331165" },
   ],
-  // Update these to the real handles — used for follow buttons, the embeds and SEO.
+  // Official handles (from his Instagram bio). Env vars can still override them.
   social: {
-    instagram: process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/",
-    facebook: process.env.NEXT_PUBLIC_FACEBOOK_URL || "https://www.facebook.com/",
-    youtube: process.env.NEXT_PUBLIC_YOUTUBE_URL || "https://www.youtube.com/",
+    instagram: process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/kuber_maheshwari_bhajan/",
+    facebook: process.env.NEXT_PUBLIC_FACEBOOK_URL || "https://www.facebook.com/maheshwariankit21",
+    youtube: process.env.NEXT_PUBLIC_YOUTUBE_URL || "https://www.youtube.com/@KuberMaheshwariBhajan",
   },
   keywords: [
     "Kuber Maheshwari",
@@ -29,7 +27,6 @@ export const site = {
     "Indore singer",
     "Mata Jagran singer",
     "Shyam Kirtan",
-    "K M Audio Productions",
   ],
 };
 
@@ -81,13 +78,6 @@ export const services = [
     desc: "Devotional and celebratory music for weddings and the family's special occasions.",
     image: "/images/gallery/kuber-28.webp",
   },
-  {
-    slug: "studio",
-    hi: "K M Audio Productions",
-    en: "Recording Studio",
-    desc: "Recording, music production and arrangement for bhajans, albums and devotional content at K M Audio Productions.",
-    image: "/images/gallery/kuber-08.webp",
-  },
 ];
 
 export const journey = [
@@ -110,6 +100,6 @@ export const journey = [
   {
     year: "2018 से आज",
     title: "एक व्यवस्थित भजन गायक",
-    text: "2018 से अब तक, स्वयं को एक व्यवस्थित भजन गायक के रूप में स्थापित करने की साधना जारी है। आज इनकी विशेष पहचान है संगीतमय श्री सुन्दरकाण्ड प्रस्तुति (भावार्थ सहित)। साथ ही इंदौर में अपना रिकॉर्डिंग स्टूडियो “K M Audio Productions” भी चलाते हैं।",
+    text: "2018 से अब तक, स्वयं को एक व्यवस्थित भजन गायक के रूप में स्थापित करने की साधना जारी है। आज इनकी विशेष पहचान है संगीतमय श्री सुन्दरकाण्ड प्रस्तुति (भावार्थ सहित)।",
   },
 ];

@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { site, waLink } from "@/lib/site";
 
-const types = ["Sundarkand", "Bhajan Sandhya", "Bhajan Clubbing", "Bhakti Fusion", "Mata Jagran", "Shyam Kirtan", "Wedding / Family function", "Studio recording", "Other"];
+const types = ["Sundarkand", "Bhajan Sandhya", "Bhajan Clubbing", "Bhakti Fusion", "Mata Jagran", "Shyam Kirtan", "Wedding / Family function", "Other"];
 
 export default function EnquiryForm({ defaultType }: { defaultType?: string }) {
   const [state, setState] = useState<"idle" | "busy" | "done">("idle");

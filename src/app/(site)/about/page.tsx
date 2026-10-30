@@ -25,14 +25,13 @@ export default function About() {
       <section className="mx-auto grid max-w-[1500px] gap-6 px-5 md:grid-cols-12 md:px-10">
         <ParallaxImage src="/images/gallery/kuber-18.webp" alt="Kuber Maheshwari" className="aspect-[4/5] md:col-span-7" priority />
         <div className="flex flex-col justify-end gap-6 md:col-span-5">
-          <ParallaxImage src="/images/gallery/kuber-08.webp" alt="At the harmonium" className="aspect-[4/3]" strength={16} />
           <Reveal>
             <dl className="grid grid-cols-2 gap-6 border-t border-ivory/10 pt-6 text-sm">
               {[
                 ["Stage name", site.nameHi],
                 ["Birthplace", "Indore"],
                 ["Education", "B.Com. Graduate"],
-                ["Studio", site.studio],
+                ["Based in", "Indore, Madhya Pradesh"],
               ].map(([k, v]) => (
                 <div key={k}>
                   <dt className="text-[11px] uppercase tracking-[0.3em] text-muted">{k}</dt>

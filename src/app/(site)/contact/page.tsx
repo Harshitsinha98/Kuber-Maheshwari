@@ -15,7 +15,7 @@ export default function Contact() {
     <>
       <PageHeader kicker="संपर्क · Contact" hi="आइए, बात करें" title="Let's talk" italic="bhakti." />
       <section className="mx-auto max-w-[1500px] px-5 md:px-10">
-        <div className="grid gap-px bg-ivory/10 md:grid-cols-3">
+        <div className="grid gap-px bg-ivory/10 md:grid-cols-2">
           {site.phones.map((p, i) => (
             <Reveal key={p.tel} delay={i * 0.08} className="bg-night p-8 md:p-10">
               <p className="text-[11px] uppercase tracking-[0.3em] text-muted">Phone {i + 1}</p>

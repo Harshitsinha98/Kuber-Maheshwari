@@ -6,6 +6,8 @@ import Link from "next/link";
 import { useRef } from "react";
 import { Magnetic } from "@/components/motion/Reveal";
 import { photo } from "@/lib/photos";
+import { site } from "@/lib/site";
+import { FacebookIcon, InstagramIcon, YoutubeIcon } from "@/components/site/Icons";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 const ramp = (v: number, a: number, b: number) => Math.min(1, Math.max(0, (v - a) / (b - a)));
@@ -55,19 +57,27 @@ export default function Hero() {
           ))}
         </div>
 
-        {/* Name, split around the arch */}
-        <motion.div style={{ opacity: fade }} className="pointer-events-none absolute inset-x-0 top-[11.5vh] z-20 text-center md:top-[13vh]">
+        {/* Invocation first, then the name, split around the arch */}
+        <motion.div style={{ opacity: fade }} className="pointer-events-none absolute inset-x-0 top-[max(88px,11vh)] z-20 text-center md:top-[max(92px,11.5vh)]">
+          <motion.p
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.2, ease, delay: 0.1 }}
+            className="font-hindi text-sm text-saffron md:text-base"
+          >
+            ॥ श्री गणेशाय नमः ॥
+          </motion.p>
           <motion.p
             initial={{ opacity: 0, wordSpacing: "1.4em", y: 10 }}
             animate={{ opacity: 1, wordSpacing: "0.5em", y: 0 }}
             transition={{ duration: 1.8, ease, delay: 0.2 }}
-            className="font-hindi text-lg text-gold md:text-xl"
+            className="mt-1 font-hindi text-lg text-gold md:text-xl"
           >
             कुबेर माहेश्वरी
           </motion.p>
         </motion.div>
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-[13svh] top-[18.5svh] z-10 flex flex-col justify-between px-4 md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:flex-row md:items-center md:px-8">
+        <div className="pointer-events-none absolute inset-x-0 bottom-[13svh] top-[22svh] z-10 flex flex-col justify-between px-4 md:bottom-0 md:top-0 md:flex-row md:items-center md:px-8">
           <motion.h1 style={{ x: leftX, opacity: fade }} className="font-display text-[21vw] font-medium leading-none tracking-[-0.03em] text-ivory md:text-[11.5vw]">
             <span className="-my-[0.15em] block overflow-hidden py-[0.15em]">
               <motion.span className="block" initial={{ y: "125%" }} animate={{ y: 0 }} transition={{ duration: 1.4, ease, delay: 0.35 }}>
@@ -75,7 +85,7 @@ export default function Hero() {
               </motion.span>
             </span>
           </motion.h1>
-          <motion.span style={{ x: rightX, opacity: fade }} className="self-end font-display text-[16vw] font-medium italic leading-none tracking-[-0.03em] text-gold md:self-auto md:text-[11.5vw]" aria-hidden>
+          <motion.span style={{ x: rightX, opacity: fade }} className="self-end font-display text-[16vw] font-medium italic leading-none tracking-[-0.03em] text-gold md:mb-[16vh] md:text-[11.5vw]" aria-hidden>
             <span className="-my-[0.15em] block overflow-hidden py-[0.15em] pr-[0.1em]">
               <motion.span className="block" initial={{ y: "125%" }} animate={{ y: 0 }} transition={{ duration: 1.4, ease, delay: 0.5 }}>
                 Maheshwari
@@ -91,15 +101,15 @@ export default function Hero() {
           transition={{ duration: 1.6, ease, delay: 0.15 }}
           className="relative z-[5] mt-[4vh] overflow-hidden md:mt-[10vh]"
         >
-          {/* 2046×2400 camera original: stays sharp even when the frame opens to full screen. */}
+          {/* 1920×2400 camera original: stays sharp even when the frame opens to full screen. */}
           <Image
-            {...photo("kuber-25")}
+            {...photo("kuber-47")}
             alt="Kuber Maheshwari singing live"
             fill
             priority
             quality={90}
             sizes="100vw"
-            className="object-cover object-[48%_20%]"
+            className="object-cover object-[50%_22%]"
           />
           <motion.div style={{ opacity: overlay }} className="absolute inset-0 bg-night" />
           <div className="absolute inset-0 bg-gradient-to-t from-night/70 via-transparent to-transparent" />
@@ -123,6 +133,30 @@ export default function Hero() {
             </div>
           </motion.div>
         </motion.div>
+
+        {/* Social tabs, always visible on the front of the site */}
+        <nav aria-label="Social" className="absolute right-3 top-1/2 z-30 flex -translate-y-1/2 flex-col gap-3 md:right-6">
+          {[
+            [site.social.instagram, InstagramIcon, "Instagram"],
+            [site.social.facebook, FacebookIcon, "Facebook"],
+            [site.social.youtube, YoutubeIcon, "YouTube"],
+          ].map(([href, Icon, label]) => {
+            const I = Icon as typeof InstagramIcon;
+            return (
+              <a
+                key={label as string}
+                href={href as string}
+                target="_blank"
+                rel="noopener"
+                aria-label={label as string}
+                title={label as string}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-ivory/20 bg-night/60 text-ivory/85 backdrop-blur transition hover:border-gold hover:bg-gold hover:text-night md:h-11 md:w-11"
+              >
+                <I className="h-4 w-4" />
+              </a>
+            );
+          })}
+        </nav>
 
         <motion.div style={{ opacity: fade }} className="absolute bottom-7 left-5 z-20 hidden text-[11px] uppercase tracking-[0.3em] text-muted md:left-10 md:block">
           Bhajan · Sundarkand · Bhakti Fusion

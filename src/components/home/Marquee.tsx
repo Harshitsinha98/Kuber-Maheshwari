@@ -1,4 +1,4 @@
-const items = ["Sundarkand", "भजन संध्या", "Bhajan Clubbing", "भक्ति फ्यूज़न", "Mata Jagran", "श्याम कीर्तन", "Weddings", "Studio"];
+const items = ["Sundarkand", "भजन संध्या", "Bhajan Clubbing", "भक्ति फ्यूज़न", "Mata Jagran", "श्याम कीर्तन", "Weddings"];
 
 export default function Marquee({ reverse = false, tone = "saffron" }: { reverse?: boolean; tone?: "saffron" | "dark" }) {
   const row = [...items, ...items];
