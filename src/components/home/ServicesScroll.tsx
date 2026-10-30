@@ -45,7 +45,7 @@ export default function ServicesScroll() {
               data-cursor="Explore"
               className="group relative h-[58vh] w-[78vw] shrink-0 overflow-hidden bg-night text-ivory sm:w-[46vw] lg:w-[30vw]"
             >
-              <Image src={s.image} alt={s.en} fill sizes="(max-width:768px) 80vw, 30vw" quality={90} className="object-cover object-[50%_28%] transition-transform duration-[1.4s] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.04]" />
+              <Image src={s.image} alt={s.en} fill sizes="(max-width:768px) 80vw, 30vw" quality={90} style={{ objectPosition: s.focus }} className="object-cover transition-transform duration-[1.4s] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.04]" />
               <div className="absolute inset-0 bg-gradient-to-t from-night via-night/30 to-transparent" />
               <div className="absolute left-6 top-6 font-display text-lg text-gold">{String(i + 1).padStart(2, "0")}</div>
               {s.signature && (
