@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { startTransition, useActionState, useRef, useState } from "react";
 import { PERMISSIONS, type Perm } from "@/lib/permissions";
 import { btn, btnGhost } from "../ui";
 import { saveTeamMember, type TeamState } from "./actions";
@@ -45,7 +45,16 @@ export default function TeamForm({ member, onDone }: { member?: Member; onDone?:
   );
 
   return (
-    <form ref={ref} action={action} className="space-y-5">
+    <form
+      ref={ref}
+      onSubmit={(e) => {
+        // Submit manually so React does not clear the fields when the server returns an error.
+        e.preventDefault();
+        const fd = new FormData(e.currentTarget);
+        startTransition(() => action(fd));
+      }}
+      className="space-y-5"
+    >
       {member && <input type="hidden" name="id" value={member.id} />}
       <div className="grid gap-3 md:grid-cols-2">
         <label className="text-sm">

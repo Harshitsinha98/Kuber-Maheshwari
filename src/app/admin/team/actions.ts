@@ -5,6 +5,7 @@ import { z } from "zod";
 import { ownerEmails, requireAccess } from "@/lib/auth";
 import { isPerm } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
+import { withTeamTable } from "@/lib/team-table";
 
 export type TeamState = { error?: string; ok?: string } | undefined;
 
@@ -28,8 +29,8 @@ const me = (s: Awaited<ReturnType<typeof owner>>) => (s.user.email || "").toLowe
 const syncUserRole = (email: string, role: "ADMIN" | "STAFF" | "USER") =>
   prisma.user.updateMany({ where: { email: { equals: email, mode: "insensitive" } }, data: { role } }).catch(() => {});
 
-const tableHint = (e: unknown) =>
-  /TeamMember|does not exist|P2021/.test(String((e as Error)?.message ?? e)) ? "The team table is missing in the database. Run the SQL from README → Team & access once." : "Could not save. Please try again.";
+/** A message meant for the person filling the form (not a crash). */
+class FormError extends Error {}
 
 export async function saveTeamMember(_prev: TeamState, fd: FormData): Promise<TeamState> {
   const s = await owner();
@@ -48,19 +49,23 @@ export async function saveTeamMember(_prev: TeamState, fd: FormData): Promise<Te
   if (role === "STAFF" && permissions.length === 0) return { error: "Tick at least one section the employee can use." };
 
   try {
-    if (id) {
-      const cur = await prisma.teamMember.findUnique({ where: { id } });
-      if (!cur) return { error: "This person was already removed." };
-      if (cur.email === me(s)) return { error: "You cannot change your own access. Ask another owner." };
-      await prisma.teamMember.update({ where: { id }, data: { name: name || null, role, permissions } });
-    } else {
-      const exists = await prisma.teamMember.findUnique({ where: { email } });
-      if (exists) return { error: "Already on the team. Use Edit on their card." };
-      await prisma.teamMember.create({ data: { email, name: name || null, role, permissions, addedBy: me(s) } });
-    }
+    // Creates the table on first use if the database was set up before this feature.
+    await withTeamTable(async () => {
+      if (id) {
+        const cur = await prisma.teamMember.findUnique({ where: { id } });
+        if (!cur) throw new FormError("This person was already removed.");
+        if (cur.email === me(s)) throw new FormError("You cannot change your own access. Ask another owner.");
+        await prisma.teamMember.update({ where: { id }, data: { name: name || null, role, permissions } });
+      } else {
+        const exists = await prisma.teamMember.findUnique({ where: { email } });
+        if (exists) throw new FormError("Already on the team. Use Edit on their card.");
+        await prisma.teamMember.create({ data: { email, name: name || null, role, permissions, addedBy: me(s) } });
+      }
+    });
   } catch (e) {
+    if (e instanceof FormError) return { error: e.message };
     console.error("[team]", e);
-    return { error: tableHint(e) };
+    return { error: "Could not save. Please try again." };
   }
   await syncUserRole(email, role);
   revalidatePath("/admin/team");
@@ -69,7 +74,7 @@ export async function saveTeamMember(_prev: TeamState, fd: FormData): Promise<Te
 
 export async function removeTeamMember(id: string) {
   const s = await owner();
-  const m = await prisma.teamMember.findUnique({ where: { id } });
+  const m = await withTeamTable(() => prisma.teamMember.findUnique({ where: { id } }));
   if (!m) return;
   if (m.email === me(s)) throw new Error("You cannot remove yourself");
   await prisma.teamMember.delete({ where: { id } });

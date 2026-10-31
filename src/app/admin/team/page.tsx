@@ -3,6 +3,7 @@ import { envStaffEmails, ownerEmails } from "@/lib/auth";
 import { fmtDate } from "@/lib/format";
 import { PERMISSIONS } from "@/lib/permissions";
 import { prisma, safe } from "@/lib/prisma";
+import { withTeamTable } from "@/lib/team-table";
 import { guard } from "../guard";
 import { Badge, Card, PageTitle } from "../ui";
 import RemoveButton from "./RemoveButton";
@@ -17,7 +18,7 @@ export default async function TeamPage() {
   const myEmail = (s.user.email || "").toLowerCase();
 
   let tableMissing = false;
-  const members = await prisma.teamMember.findMany({ orderBy: [{ role: "asc" }, { createdAt: "asc" }] }).catch((e) => {
+  const members = await withTeamTable(() => prisma.teamMember.findMany({ orderBy: [{ role: "asc" }, { createdAt: "asc" }] })).catch((e) => {
     console.error("[team]", (e as Error).message);
     tableMissing = true;
     return [];
@@ -61,10 +62,8 @@ export default async function TeamPage() {
 
       {tableMissing && (
         <Card className="mb-6 border-amber-300 bg-amber-50">
-          <p className="font-semibold text-amber-900">One-time database step needed</p>
-          <p className="mt-1 text-sm text-amber-900/80">
-            Open Supabase → SQL Editor and run the &quot;Team &amp; access&quot; SQL from the README. Then reload this page.
-          </p>
+          <p className="font-semibold text-amber-900">Could not reach the team list</p>
+          <p className="mt-1 text-sm text-amber-900/80">The database did not respond. Reload in a minute; if it keeps happening, run the &quot;Team &amp; access&quot; SQL from the README in Supabase.</p>
         </Card>
       )}
 

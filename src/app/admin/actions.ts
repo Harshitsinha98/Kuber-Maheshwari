@@ -69,7 +69,14 @@ export async function saveEvent(id: string | null, _prev: FormState, fd: FormDat
 
   let posterUrl = d.posterUrl || null;
   const poster = fd.get("posterFile");
-  if (poster instanceof File && poster.size > 0) posterUrl = (await uploadImage(poster, "posters")).url;
+  if (poster instanceof File && poster.size > 0) {
+    try {
+      posterUrl = (await uploadImage(poster, "posters")).url;
+    } catch (e) {
+      console.error("[poster]", e);
+      return { error: `Poster upload failed: ${(e as Error).message}` };
+    }
+  }
 
   const data = {
     title: d.title,
@@ -114,7 +121,8 @@ export async function saveEvent(id: string | null, _prev: FormState, fd: FormDat
       return ev.id;
     });
   } catch (e) {
-    return { error: (e as Error).message };
+    console.error("[event]", e);
+    return { error: (e as Error).message || "Could not save the event. Please try again." };
   }
   revalidatePublic();
   redirect(`/admin/events/${eventId}?saved=1`);
@@ -186,7 +194,7 @@ export async function sendRemindersNow(): Promise<EmailActionState> {
 // ---------- Media ----------
 
 async function uploadImage(file: File, folder: string) {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) throw new Error("Image uploads need BLOB_READ_WRITE_TOKEN (Vercel Blob). You can paste an image URL instead.");
+  if (!process.env.BLOB_READ_WRITE_TOKEN) throw new Error("photo uploads are not switched on yet (in Vercel open Storage, create a Blob store, connect it to this project, then redeploy). For now paste an image link in the \"poster image URL\" box instead.");
   if (file.size > 15 * 1024 * 1024) throw new Error("Image too large (max 15 MB)");
   const input = Buffer.from(await file.arrayBuffer());
   const img = sharp(input).rotate().resize({ width: 1800, height: 1800, fit: "inside", withoutEnlargement: true });
