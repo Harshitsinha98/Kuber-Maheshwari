@@ -111,7 +111,7 @@ The "Add to Google Wallet" / "Add to Apple Wallet" buttons appear automatically 
 ## Event-day workflow
 1. Admin → Events → create event, add ticket types (price ₹0 = free pass) → set **Published**.
 2. Buyers get QR tickets by email and under *My Tickets*.
-3. Add gate volunteers' Gmail IDs to `STAFF_EMAILS`. They sign in on their phone and open `/admin/scan` (they can only scan).
+3. Add gate volunteers from **Admin → Team & Access** as *Employee* with only *Scan Tickets* ticked (the older `STAFF_EMAILS` env list still works the same way). They sign in on their phone and open `/admin/scan`.
 4. After the event: Admin → event → **Export CSV** for the attendee list with check-in times.
 
 ## Environment variables
@@ -132,3 +132,30 @@ Source photos live in `assets/` (they are not served directly). `node scripts/op
 - `assets/brand/km-logo-source.jpg`: high-res logo that `public/images/brand/km-logo.png` was cut from.
 
 Don't put raw camera photos in `public/`: everything there ships with the site.
+
+## Team & access (co-owners and employees)
+
+- **Owner**: Gmail IDs in `ADMIN_EMAILS` (Vercel env). Always full access; cannot be removed from the panel.
+- **Co-owner**: added in **Admin → Team & Access**. Exactly the same rights as the owner, including adding/removing people.
+- **Employee**: added in the same page. Sees and can use only the sections ticked for them (Dashboard, Events, Bookings, Scan, Enquiries, Gallery, Videos, Testimonials, Social, WhatsApp, Email). Everything else is hidden in the menu and blocked on the server.
+
+Everyone signs in with Google using the exact Gmail address that was added. Rights are checked on every admin page and action, so changes and removals apply immediately. Nobody can change or remove their own access.
+
+**One-time database step** (existing databases only). In Supabase → SQL Editor, run:
+
+```sql
+CREATE TABLE "TeamMember" (
+    "id" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "name" TEXT,
+    "role" "Role" NOT NULL,
+    "permissions" TEXT[] DEFAULT ARRAY[]::TEXT[],
+    "addedBy" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    CONSTRAINT "TeamMember_pkey" PRIMARY KEY ("id")
+);
+CREATE UNIQUE INDEX "TeamMember_email_key" ON "TeamMember"("email");
+```
+
+(or `DATABASE_URL=... DIRECT_URL=... npx prisma db push` from a computer). Until this runs the site works as before; only the Team page shows a reminder.

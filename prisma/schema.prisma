@@ -10,8 +10,8 @@ datasource db {
 
 enum Role {
   USER
-  STAFF // can scan tickets at the gate
-  ADMIN
+  STAFF // employee: only the admin sections the owner ticks
+  ADMIN // owner / co-owner: everything
 }
 
 enum BookingStatus {
@@ -76,6 +76,20 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+// ---------- Admin team ----------
+// Owners come from ADMIN_EMAILS (env). Everyone else on the team is added from Admin → Team
+// by their Gmail address; they get access the moment they sign in with that Google account.
+model TeamMember {
+  id          String   @id @default(cuid())
+  email       String   @unique // lower-case Gmail / Google account
+  name        String?
+  role        Role // ADMIN = co-owner (same rights as owner), STAFF = employee
+  permissions String[] @default([]) // employee sections, see src/lib/permissions.ts
+  addedBy     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 // ---------- Events & Ticketing ----------
 model Event {
   id          String       @id @default(cuid())
@@ -100,15 +114,15 @@ model Event {
 }
 
 model TicketType {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   eventId     String
   name        String // e.g. "VIP", "General"
   description String?
   price       Int // in paise (0 = free registration)
   capacity    Int
-  maxPerOrder Int      @default(10)
-  sortOrder   Int      @default(0)
-  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  maxPerOrder Int       @default(10)
+  sortOrder   Int       @default(0)
+  event       Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
   bookings    Booking[]
   tickets     Ticket[]
 }

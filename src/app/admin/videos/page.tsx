@@ -8,7 +8,7 @@ import VideoForm from "./VideoForm";
 export const dynamic = "force-dynamic";
 
 export default async function AdminVideos() {
-  await guard();
+  await guard("videos");
   const list = await prisma.video.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }] });
   return (
     <>

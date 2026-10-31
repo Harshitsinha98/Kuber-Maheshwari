@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function EventPage({ params }: Props) {
-  const isAdmin = (await getSession())?.user?.role === "ADMIN";
+  const isAdmin = ((await getSession())?.user?.perms ?? []).includes("events"); // may preview drafts
   const e = await getEvent((await params).slug, isAdmin);
   if (!e) notFound();
   const draft = e.status === "DRAFT";

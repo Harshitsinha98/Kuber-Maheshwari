@@ -6,7 +6,7 @@ import Scanner from "./Scanner";
 export const dynamic = "force-dynamic";
 
 export default async function ScanPage({ searchParams }: { searchParams: Promise<{ event?: string }> }) {
-  await guard(["ADMIN", "STAFF"]);
+  await guard("scan");
   const { event } = await searchParams;
   const events = await prisma.event.findMany({
     where: { status: "PUBLISHED", startsAt: { gte: new Date(Date.now() - 2 * 86400e3) } },

@@ -5,14 +5,16 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import sharp from "sharp";
 import { z } from "zod";
-import { requireRole } from "@/lib/auth";
+import { requireAccess } from "@/lib/auth";
+import type { Perm } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { fromLocalIST, slugify } from "@/lib/format";
 import { refreshInstagramToken, setSetting } from "@/lib/social";
 import { sendTestEmail, sendTicketEmailAndMark, sendTomorrowReminders } from "@/lib/email";
 
-async function admin() {
-  const s = await requireRole(["ADMIN"]);
+/** Every action checks the caller's current rights (fresh from the DB), not just the page they came from. */
+async function need(perm: Perm | Perm[]) {
+  const s = await requireAccess(perm);
   if (!s) throw new Error("Not authorised");
   return s;
 }
@@ -59,7 +61,7 @@ const EventIn = z.object({
 export type FormState = { error?: string } | undefined;
 
 export async function saveEvent(id: string | null, _prev: FormState, fd: FormData): Promise<FormState> {
-  await admin();
+  await need("events");
   const raw = Object.fromEntries(fd);
   const p = EventIn.safeParse(raw);
   if (!p.success) return { error: p.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join(", ") };
@@ -119,7 +121,7 @@ export async function saveEvent(id: string | null, _prev: FormState, fd: FormDat
 }
 
 export async function deleteEvent(id: string) {
-  await admin();
+  await need("events");
   const paid = await prisma.booking.count({ where: { eventId: id, status: "PAID" } });
   if (paid > 0) throw new Error("Event has paid bookings. Cancel it instead of deleting.");
   await prisma.booking.deleteMany({ where: { eventId: id } });
@@ -129,13 +131,13 @@ export async function deleteEvent(id: string) {
 }
 
 export async function manualCheckIn(ticketId: string, undo = false) {
-  const s = await admin();
+  const s = await need(["scan", "events"]);
   await prisma.ticket.update({ where: { id: ticketId }, data: undo ? { checkedInAt: null, checkedInBy: null } : { checkedInAt: new Date(), checkedInBy: s.user.email } });
   revalidatePath("/admin/events");
 }
 
 export async function resendTickets(bookingId: string) {
-  await admin();
+  await need(["events", "bookings", "email"]);
   await sendTicketEmailAndMark(bookingId);
   revalidatePath("/admin/email");
   revalidatePath("/admin/bookings");
@@ -146,7 +148,7 @@ export async function resendTickets(bookingId: string) {
 export type EmailActionState = { ok?: string; error?: string } | undefined;
 
 export async function sendTestEmailAction(_prev: EmailActionState, fd: FormData): Promise<EmailActionState> {
-  await admin();
+  await need("email");
   const to = String(fd.get("to") || "").trim();
   if (!z.string().email().safeParse(to).success) return { error: "Enter a valid email address" };
   const r = await sendTestEmail(to);
@@ -155,7 +157,7 @@ export async function sendTestEmailAction(_prev: EmailActionState, fd: FormData)
 }
 
 export async function resendUnsentTickets(): Promise<EmailActionState> {
-  await admin();
+  await need("email");
   const pending = await prisma.booking.findMany({ where: { status: "PAID", emailSentAt: null }, select: { id: true }, take: 50 });
   if (!pending.length) return { ok: "Nothing to send: every paid booking has received its tickets." };
   let sent = 0;
@@ -173,7 +175,7 @@ export async function resendUnsentTickets(): Promise<EmailActionState> {
 }
 
 export async function sendRemindersNow(): Promise<EmailActionState> {
-  await admin();
+  await need("email");
   const r = await sendTomorrowReminders();
   if (!r.events.length) return { ok: "No published events tomorrow, so no reminders were needed." };
   return {
@@ -194,7 +196,7 @@ async function uploadImage(file: File, folder: string) {
 }
 
 export async function addGalleryImages(_prev: FormState, fd: FormData): Promise<FormState> {
-  await admin();
+  await need("gallery");
   try {
     const files = fd.getAll("files").filter((f): f is File => f instanceof File && f.size > 0);
     const url = String(fd.get("url") || "").trim();
@@ -214,7 +216,7 @@ export async function addGalleryImages(_prev: FormState, fd: FormData): Promise<
 }
 
 export async function deleteGalleryImage(id: string) {
-  await admin();
+  await need("gallery");
   await prisma.galleryItem.delete({ where: { id } });
   revalidatePublic();
   revalidatePath("/admin/gallery");
@@ -223,7 +225,7 @@ export async function deleteGalleryImage(id: string) {
 const ytId = (s: string) => s.match(/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/)?.[1] || (/^[\w-]{11}$/.test(s) ? s : null);
 
 export async function addVideo(_prev: FormState, fd: FormData): Promise<FormState> {
-  await admin();
+  await need("videos");
   const id = ytId(String(fd.get("url") || "").trim());
   const title = String(fd.get("title") || "").trim();
   if (!id) return { error: "Paste a valid YouTube link" };
@@ -235,7 +237,7 @@ export async function addVideo(_prev: FormState, fd: FormData): Promise<FormStat
 }
 
 export async function deleteVideo(id: string) {
-  await admin();
+  await need("videos");
   await prisma.video.delete({ where: { id } });
   revalidatePublic();
   revalidatePath("/admin/videos");
@@ -244,7 +246,7 @@ export async function deleteVideo(id: string) {
 // ---------- Enquiries ----------
 
 export async function toggleEnquiry(id: string, handled: boolean) {
-  await admin();
+  await need("enquiries");
   await prisma.enquiry.update({ where: { id }, data: { handled } });
   revalidatePath("/admin/enquiries");
 }
@@ -252,7 +254,7 @@ export async function toggleEnquiry(id: string, handled: boolean) {
 // ---------- Social ----------
 
 export async function saveSocial(_prev: FormState, fd: FormData): Promise<FormState & { ok?: string }> {
-  await admin();
+  await need("social");
   const ig = String(fd.get("instagram_token") || "").trim();
   const fbId = String(fd.get("facebook_page_id") || "").trim();
   const fbToken = String(fd.get("facebook_page_token") || "").trim();
@@ -266,7 +268,7 @@ export async function saveSocial(_prev: FormState, fd: FormData): Promise<FormSt
 }
 
 export async function refreshSocialNow() {
-  await admin();
+  await need("social");
   const r = await refreshInstagramToken();
   revalidateTag("instagram");
   revalidateTag("facebook");
@@ -284,7 +286,7 @@ const TestimonialIn = z.object({
 });
 
 export async function addTestimonial(_prev: FormState, fd: FormData): Promise<FormState> {
-  await admin();
+  await need("testimonials");
   const p = TestimonialIn.safeParse(Object.fromEntries(fd));
   if (!p.success) return { error: p.error.issues[0]?.message };
   const { getTestimonials, saveTestimonials } = await import("@/lib/testimonials");
@@ -297,7 +299,7 @@ export async function addTestimonial(_prev: FormState, fd: FormData): Promise<Fo
 }
 
 export async function deleteTestimonial(id: string) {
-  await admin();
+  await need("testimonials");
   const { getTestimonials, saveTestimonials } = await import("@/lib/testimonials");
   await saveTestimonials((await getTestimonials()).filter((t) => t.id !== id));
   revalidatePath("/");
@@ -307,7 +309,7 @@ export async function deleteTestimonial(id: string) {
 // ---------- WhatsApp ----------
 
 export async function whatsappTestAction(_prev: EmailActionState, fd: FormData): Promise<EmailActionState> {
-  await admin();
+  await need("whatsapp");
   const kind = String(fd.get("kind") || "booking") as "booking" | "enquiry" | "ticket";
   const to = String(fd.get("to") || "").trim() || undefined;
   const { whatsappTest } = await import("@/lib/whatsapp");

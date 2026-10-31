@@ -12,7 +12,7 @@ import { deleteEvent, manualCheckIn, resendTickets } from "../../actions";
 export const dynamic = "force-dynamic";
 
 export default async function EditEvent({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ saved?: string }> }) {
-  await guard();
+  await guard("events");
   const { id } = await params;
   const { saved } = await searchParams;
   const e = await prisma.event.findUnique({

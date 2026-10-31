@@ -68,7 +68,7 @@ const K = ({ label, value, sub, trend, icon, tone = "saffron" }: { label: string
 };
 
 export default async function Dashboard() {
-  const s = await guard();
+  const s = await guard("dashboard");
   const now = new Date();
   const today = startOfIstDay(now);
   const d7 = new Date(now.getTime() - 7 * 86400e3);
