@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { startTransition, useActionState, useState } from "react";
 import { compressImage } from "@/lib/compress-image";
 import { saveEvent, type FormState } from "../actions";
 import { btn, btnGhost } from "../ui";
@@ -25,6 +25,26 @@ export type EventDefaults = {
 };
 
 const categories = ["Bhajan Sandhya", "Sundarkand", "Bhajan Clubbing", "Bhakti Fusion", "Mata Jagran", "Shyam Kirtan", "Concert"];
+const OTHER = "__other";
+
+/** Dropdown with every category; "Other…" opens a text box for a custom one. */
+function CategoryPicker({ initial }: { initial: string }) {
+  const known = categories.includes(initial);
+  const [choice, setChoice] = useState(known || !initial ? initial || categories[0] : OTHER);
+  return (
+    <div className="space-y-2">
+      <select value={choice} onChange={(e) => setChoice(e.target.value)} className="admin-input" name={choice === OTHER ? undefined : "category"}>
+        {categories.map((c) => (
+          <option key={c} value={c}>
+            {c}
+          </option>
+        ))}
+        <option value={OTHER}>Other…</option>
+      </select>
+      {choice === OTHER && <input name="category" required minLength={2} defaultValue={known ? "" : initial} className="admin-input" placeholder="Type the category" autoFocus />}
+    </div>
+  );
+}
 
 export default function EventForm({ id, d }: { id: string | null; d: EventDefaults }) {
   const [state, action, pending] = useActionState<FormState, FormData>(async (prev, fd) => {
@@ -40,18 +60,21 @@ export default function EventForm({ id, d }: { id: string | null; d: EventDefaul
     );
 
   return (
-    <form action={action} className="space-y-6">
+    <form
+      onSubmit={(e) => {
+        // Submit manually so React does not clear the fields when the server returns an error.
+        e.preventDefault();
+        const fd = new FormData(e.currentTarget);
+        startTransition(() => action(fd));
+      }}
+      className="space-y-6"
+    >
       <div className="grid gap-4 md:grid-cols-2">
         <L label="Title *">
           <input name="title" required defaultValue={d.title} className="admin-input" placeholder="e.g. Sangeetmay Sundarkand, Indore" />
         </L>
         <L label="Category *">
-          <input name="category" required defaultValue={d.category} list="cats" className="admin-input" />
-          <datalist id="cats">
-            {categories.map((c) => (
-              <option key={c} value={c} />
-            ))}
-          </datalist>
+          <CategoryPicker initial={d.category} />
         </L>
         <L label="Subtitle" wide>
           <input name="subtitle" defaultValue={d.subtitle} className="admin-input" placeholder="One line shown under the title" />
