@@ -1,8 +1,8 @@
-import { requireRole } from "@/lib/auth";
+import { requireAccess } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await requireRole(["ADMIN"]))) return new Response("Forbidden", { status: 403 });
+  if (!(await requireAccess(["events", "bookings"]))) return new Response("Forbidden", { status: 403 });
   const { id } = await params;
   const e = await prisma.event.findUnique({
     where: { id },

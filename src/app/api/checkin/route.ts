@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { requireRole } from "@/lib/auth";
+import { requireAccess } from "@/lib/auth";
 import { checkIn } from "@/lib/tickets";
 
 const Body = z.object({
@@ -11,8 +11,8 @@ const Body = z.object({
 });
 
 export async function POST(req: Request) {
-  const s = await requireRole(["ADMIN", "STAFF"]);
-  if (!s) return NextResponse.json({ error: "Only admin/staff can scan tickets" }, { status: 403 });
+  const s = await requireAccess("scan");
+  if (!s) return NextResponse.json({ error: "You do not have permission to scan tickets" }, { status: 403 });
   const p = Body.safeParse(await req.json().catch(() => ({})));
   if (!p.success) return NextResponse.json({ ok: false, status: "INVALID" }, { status: 400 });
   const result = await checkIn(p.data.payload, s.user.email || "staff", p.data.eventId || undefined, p.data.admit);

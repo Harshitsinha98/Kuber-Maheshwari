@@ -9,7 +9,7 @@ import UploadForm from "./UploadForm";
 export const dynamic = "force-dynamic";
 
 export default async function AdminGallery() {
-  await guard();
+  await guard("gallery");
   const items = await prisma.galleryItem.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }] });
   return (
     <>

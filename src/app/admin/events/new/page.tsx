@@ -3,7 +3,7 @@ import { Card, PageTitle } from "../../ui";
 import EventForm from "../EventForm";
 
 export default async function NewEvent() {
-  await guard();
+  await guard("events");
   return (
     <>
       <PageTitle title="New event" />

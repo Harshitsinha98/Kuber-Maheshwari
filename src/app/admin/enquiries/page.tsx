@@ -7,7 +7,7 @@ import { toggleEnquiry } from "../actions";
 export const dynamic = "force-dynamic";
 
 export default async function Enquiries() {
-  await guard();
+  await guard("enquiries");
   const list = await prisma.enquiry.findMany({ orderBy: [{ handled: "asc" }, { createdAt: "desc" }], take: 300 });
   return (
     <>

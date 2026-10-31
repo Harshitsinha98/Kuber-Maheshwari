@@ -18,7 +18,7 @@ export default async function BookingPage({ params, searchParams }: { params: Pr
   if (!s) redirect(`/login?callbackUrl=/bookings/${id}`);
 
   const owner = await prisma.booking.findUnique({ where: { id }, select: { userId: true } });
-  if (!owner || (owner.userId !== s.user.id && s.user.role !== "ADMIN")) notFound();
+  if (!owner || (owner.userId !== s.user.id && !(s.user.perms ?? []).includes("bookings"))) notFound();
   const v = (await loadPassView(id))!;
   const b = v.booking;
 

@@ -6,7 +6,7 @@ import SocialForm from "./SocialForm";
 export const dynamic = "force-dynamic";
 
 export default async function AdminSocial() {
-  await guard();
+  await guard("social");
   const s = await socialStatus();
   return (
     <>

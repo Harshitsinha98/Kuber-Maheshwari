@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 const when = (iso?: string) => (iso ? new Date(iso).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) : "");
 
 export default async function AdminEmail() {
-  const s = await guard();
+  const s = await guard("email");
   const cfg = emailConfig();
   const [activity, unsent] = await Promise.all([
     emailActivity(),

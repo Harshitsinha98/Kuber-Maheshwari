@@ -7,7 +7,7 @@ import TestimonialForm from "./TestimonialForm";
 export const dynamic = "force-dynamic";
 
 export default async function AdminTestimonials() {
-  await guard();
+  await guard("testimonials");
   const list = await getTestimonials();
   return (
     <>

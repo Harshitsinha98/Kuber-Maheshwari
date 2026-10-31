@@ -7,7 +7,7 @@ import { Badge, Card, PageTitle, btnGhost } from "../ui";
 export const dynamic = "force-dynamic";
 
 export default async function Bookings({ searchParams }: { searchParams: Promise<{ q?: string; status?: string }> }) {
-  await guard();
+  await guard("bookings");
   const { q, status } = await searchParams;
   const bookings = await prisma.booking.findMany({
     where: {

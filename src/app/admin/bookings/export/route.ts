@@ -1,9 +1,9 @@
-import { requireRole } from "@/lib/auth";
+import { requireAccess } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 /** All bookings (or one status) as CSV, for Excel / Google Sheets. */
 export async function GET(req: Request) {
-  if (!(await requireRole(["ADMIN"]))) return new Response("Forbidden", { status: 403 });
+  if (!(await requireAccess("bookings"))) return new Response("Forbidden", { status: 403 });
   const status = new URL(req.url).searchParams.get("status");
   const rows = await prisma.booking.findMany({
     where: status ? { status: status as "PAID" } : {},

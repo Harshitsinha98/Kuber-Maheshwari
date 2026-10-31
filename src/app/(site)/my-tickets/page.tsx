@@ -29,9 +29,9 @@ export default async function MyTickets() {
           </h1>
         </div>
         <div className="flex items-center gap-4">
-          {(s.user.role === "ADMIN" || s.user.role === "STAFF") && (
-            <Link href={s.user.role === "ADMIN" ? "/admin" : "/admin/scan"} className="rounded-full border border-gold/50 px-5 py-2.5 text-xs uppercase tracking-[0.18em] text-gold">
-              {s.user.role === "ADMIN" ? "Admin panel" : "Scan tickets"}
+          {(s.user.perms ?? []).length > 0 && (
+            <Link href="/admin" className="rounded-full border border-gold/50 px-5 py-2.5 text-xs uppercase tracking-[0.18em] text-gold">
+              Admin panel
             </Link>
           )}
           <SignOutButton />

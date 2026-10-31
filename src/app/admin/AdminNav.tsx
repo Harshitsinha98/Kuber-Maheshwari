@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { Perm } from "@/lib/permissions";
 
 const I = {
   home: "M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z",
@@ -14,39 +15,45 @@ const I = {
   quote: "M7 7h4v4c0 3-2 5-4 6M15 7h4v4c0 3-2 5-4 6",
   email: "M4 6h16v12H4zM4 7l8 6 8-6",
   whatsapp: "M12 3a9 9 0 0 0-7.7 13.6L3 21l4.5-1.2A9 9 0 1 0 12 3z",
+  team: "M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 6.5M18 14a5.5 5.5 0 0 1 3.5 6",
   social: "M6 12a2.5 2.5 0 1 0 0 .01M18 6a2.5 2.5 0 1 0 0 .01M18 18a2.5 2.5 0 1 0 0 .01M8.3 11 15.7 7M8.3 13l7.4 4",
 };
 
-type Item = { href: string; label: string; icon: keyof typeof I; admin: boolean };
+/** perm: section key an employee needs; "team": owners / co-owners only */
+type Item = { href: string; label: string; icon: keyof typeof I; perm: Perm | "team" };
 const groups: { title: string; items: Item[] }[] = [
   {
     title: "Overview",
-    items: [{ href: "/admin", label: "Dashboard", icon: "home", admin: true }],
+    items: [{ href: "/admin", label: "Dashboard", icon: "home", perm: "dashboard" }],
   },
   {
     title: "Events",
     items: [
-      { href: "/admin/events", label: "Events & Tickets", icon: "events", admin: true },
-      { href: "/admin/bookings", label: "Bookings", icon: "bookings", admin: true },
-      { href: "/admin/scan", label: "Scan Tickets", icon: "scan", admin: false },
-      { href: "/admin/enquiries", label: "Enquiries", icon: "enquiries", admin: true },
+      { href: "/admin/events", label: "Events & Tickets", icon: "events", perm: "events" },
+      { href: "/admin/bookings", label: "Bookings", icon: "bookings", perm: "bookings" },
+      { href: "/admin/scan", label: "Scan Tickets", icon: "scan", perm: "scan" },
+      { href: "/admin/enquiries", label: "Enquiries", icon: "enquiries", perm: "enquiries" },
     ],
   },
   {
     title: "Website",
     items: [
-      { href: "/admin/gallery", label: "Gallery", icon: "gallery", admin: true },
-      { href: "/admin/videos", label: "Videos", icon: "videos", admin: true },
-      { href: "/admin/testimonials", label: "Testimonials", icon: "quote", admin: true },
-      { href: "/admin/social", label: "Social Feeds", icon: "social", admin: true },
+      { href: "/admin/gallery", label: "Gallery", icon: "gallery", perm: "gallery" },
+      { href: "/admin/videos", label: "Videos", icon: "videos", perm: "videos" },
+      { href: "/admin/testimonials", label: "Testimonials", icon: "quote", perm: "testimonials" },
+      { href: "/admin/social", label: "Social Feeds", icon: "social", perm: "social" },
     ],
   },
   {
     title: "Notifications",
     items: [
-      { href: "/admin/whatsapp", label: "WhatsApp", icon: "whatsapp", admin: true },
-      { href: "/admin/email", label: "Email", icon: "email", admin: true },
+      { href: "/admin/whatsapp", label: "WhatsApp", icon: "whatsapp", perm: "whatsapp" },
+      { href: "/admin/email", label: "Email", icon: "email", perm: "email" },
     ],
+  },
+  {
+    title: "Settings",
+    items: [{ href: "/admin/team", label: "Team & Access", icon: "team", perm: "team" }],
   },
 ];
 
@@ -62,9 +69,9 @@ function useActive() {
 }
 
 /** Desktop: grouped sidebar. Mobile: horizontal scroll pills. */
-export default function AdminNav({ role, badges = {} }: { role: string; badges?: Record<string, number> }) {
+export default function AdminNav({ perms, team, badges = {} }: { perms: Perm[]; team: boolean; badges?: Record<string, number> }) {
   const active = useActive();
-  const visible = groups.map((g) => ({ ...g, items: g.items.filter((i) => role === "ADMIN" || !i.admin) })).filter((g) => g.items.length);
+  const visible = groups.map((g) => ({ ...g, items: g.items.filter((i) => (i.perm === "team" ? team : perms.includes(i.perm))) })).filter((g) => g.items.length);
   return (
     <>
       <nav className="hidden space-y-6 lg:block" aria-label="Admin">

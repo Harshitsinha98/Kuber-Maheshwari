@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 const when = (iso?: string) => (iso ? new Date(iso).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) : "");
 
 export default async function AdminWhatsapp() {
-  await guard();
+  await guard("whatsapp");
   const c = whatsappConfig();
   const a = await whatsappActivity();
   const rows: [string, boolean, string][] = [

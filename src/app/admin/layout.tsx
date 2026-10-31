@@ -5,13 +5,15 @@ import { guard } from "./guard";
 import { prisma, safe } from "@/lib/prisma";
 import SignOutButton from "@/components/site/SignOutButton";
 import AdminNav from "./AdminNav";
+import { can, isOwnerKind } from "@/lib/permissions";
 
 export const metadata: Metadata = { title: "Admin", robots: { index: false, follow: false } };
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const s = await guard(["ADMIN", "STAFF"]);
-  const isAdmin = s.user.role === "ADMIN";
-  const newEnquiries = isAdmin ? await safe(() => prisma.enquiry.count({ where: { handled: false } }), 0) : 0;
+  const s = await guard();
+  const nav = { perms: s.access.perms, team: isOwnerKind(s.access.kind) };
+  const roleLabel = { owner: "Owner", coowner: "Co-owner", employee: "Employee", none: "" }[s.access.kind];
+  const newEnquiries = can(s.access, "enquiries") ? await safe(() => prisma.enquiry.count({ where: { handled: false } }), 0) : 0;
   const badges = { "/admin/enquiries": newEnquiries };
   const first = (s.user.name || "").split(" ")[0];
 
@@ -27,7 +29,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </span>
         </Link>
         <div className="mt-8 flex-1">
-          <AdminNav role={s.user.role} badges={badges} />
+          <AdminNav {...nav} badges={badges} />
         </div>
         <div className="mt-6 rounded-2xl bg-white/5 p-3">
           <div className="flex items-center gap-3">
@@ -39,6 +41,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm">{s.user.name || "Admin"}</p>
               <p className="truncate text-[11px] text-ivory/45">{s.user.email}</p>
+              <p className="mt-0.5 text-[10px] uppercase tracking-[0.2em] text-gold">{roleLabel}</p>
             </div>
           </div>
           <div className="mt-3 flex items-center justify-between text-xs">
@@ -60,7 +63,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </Link>
           <SignOutButton className="text-xs text-marigold" />
         </div>
-        <AdminNav role={s.user.role} badges={badges} />
+        <AdminNav {...nav} badges={badges} />
       </header>
 
       <main className="min-w-0 px-4 py-6 md:px-8 md:py-8">

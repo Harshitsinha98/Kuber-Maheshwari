@@ -1,10 +1,20 @@
 import { redirect } from "next/navigation";
-import type { Role } from "@prisma/client";
-import { getSession } from "@/lib/auth";
+import { getAccess, getSession } from "@/lib/auth";
+import { can, homeFor, isOwnerKind, type Perm } from "@/lib/permissions";
 
-export async function guard(roles: Role[] = ["ADMIN"]) {
+/**
+ * Protects an admin page. Access is read fresh from the DB on every request.
+ * - perm: the section this page belongs to (employees need it ticked)
+ * - "team": owners and co-owners only
+ * - nothing: anyone on the team (used by the layout)
+ */
+export async function guard(perm?: Perm | Perm[] | "team") {
   const s = await getSession();
   if (!s) redirect("/login?callbackUrl=/admin");
-  if (!roles.includes(s.user.role)) redirect(s.user.role === "STAFF" ? "/admin/scan" : "/my-tickets");
-  return s;
+  const access = await getAccess(s.user.email);
+  const home = homeFor(access);
+  if (!home) redirect("/my-tickets");
+  const ok = !perm || (perm === "team" ? isOwnerKind(access.kind) : can(access, perm));
+  if (!ok) redirect(home);
+  return { ...s, access };
 }
