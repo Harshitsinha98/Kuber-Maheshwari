@@ -1,7 +1,7 @@
 import { Resend } from "resend";
 import { prisma, safe } from "./prisma";
 import { site } from "./site";
-import { fmtDate, fmtTime, rupees } from "./format";
+import { dayKeyDate, fmtDate, fmtDateHi, fmtTime, inr, rupees } from "./format";
 import { passQrPng, passUrl } from "./tickets";
 
 /**
@@ -260,4 +260,74 @@ export async function sendTomorrowReminders() {
     report.push({ event: ev.title, sent, failed });
   }
   return { window: { from: from.toISOString(), to: to.toISOString() }, events: report };
+}
+
+// ---------- Show bookings (customer books Kuber ji for a date) ----------
+
+type ShowBookingMail = {
+  id: string;
+  ref: string;
+  date: string;
+  status: string;
+  serviceName: string;
+  locationName: string;
+  venue: string;
+  name: string;
+  phone: string;
+  email: string | null;
+  message: string | null;
+  answers: unknown;
+  total: number;
+  advanceAmount: number;
+  paidAmount: number;
+};
+
+const showRows = (b: ShowBookingMail) => {
+  const answers = Array.isArray(b.answers) ? (b.answers as { question: string; answer: string }[]) : [];
+  return [
+    ["Booking", b.ref],
+    ["Date", fmtDateHi(dayKeyDate(b.date))],
+    ["Programme", b.serviceName],
+    ["Location", b.locationName],
+    ["Venue", b.venue],
+    ...answers.map((a) => [a.question, a.answer]),
+    ["Total", inr(b.total)],
+    ["Advance paid", b.paidAmount ? inr(b.paidAmount) : "—"],
+    ["Balance", inr(Math.max(0, b.total - b.paidAmount))],
+  ]
+    .map(([k, v]) => `<tr><td style="padding:4px 12px 4px 0;color:#7a6a55;vertical-align:top">${esc(k)}</td><td>${esc(v)}</td></tr>`)
+    .join("");
+};
+
+/** Owner alert and / or customer confirmation for a show booking. Never throws. */
+export async function sendShowBookingEmails(b: ShowBookingMail, to: { owner?: boolean; customer?: boolean }) {
+  const jobs: Promise<SendResult>[] = [];
+  const { notify } = emailConfig();
+  const flag = { CONFIRMED: "✅ Confirmed", REQUESTED: "🕓 Request (confirm it)", CONFLICT: "⚠️ PAID BUT DATE TAKEN" }[b.status] ?? b.status;
+  if (to.owner && notify)
+    jobs.push(
+      sendMail({
+        to: notify,
+        subject: `${flag}: ${b.serviceName} · ${b.date} · ${b.name}`,
+        html: shell(`<p><b>${esc(b.name)}</b> · <a href="tel:${esc(b.phone)}">${esc(b.phone)}</a>${b.email ? ` · ${esc(b.email)}` : ""}</p>
+<table>${showRows(b)}</table>${b.message ? `<p style="margin-top:12px"><b>Message:</b> ${esc(b.message)}</p>` : ""}
+${b.status === "CONFLICT" ? `<p style="color:#9e2a2b"><b>The advance was paid after the date was taken. Refund it in Razorpay or move the booking to another date.</b></p>` : ""}
+<p><a href="${site.url}/admin/show-bookings/${b.id}" style="display:inline-block;background:#e8820c;color:#140d0e;padding:10px 20px;border-radius:999px;text-decoration:none;font-weight:bold">Open in admin</a></p>`),
+      }),
+    );
+  if (to.customer && b.email && b.status !== "CONFLICT") {
+    const confirmed = b.status === "CONFIRMED";
+    jobs.push(
+      sendMail({
+        to: b.email,
+        subject: confirmed ? `🙏 Booking confirmed: ${b.serviceName} on ${fmtDate(dayKeyDate(b.date))}` : `We received your booking request | ${site.name}`,
+        html: shell(`<p>नमस्ते ${esc(b.name)} ji,</p>
+<p>${confirmed ? "आपकी तारीख पक्की हो गई है। Your date is confirmed." : "आपका बुकिंग अनुरोध मिल गया है। Our team will call you shortly to confirm the date."}</p>
+<table>${showRows(b)}</table>
+<p><a href="${site.url}/booking/${b.id}" style="display:inline-block;background:#e8820c;color:#140d0e;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:bold">View booking</a></p>
+<p>जय श्री राम 🙏</p>`),
+      }),
+    );
+  }
+  await Promise.allSettled(jobs);
 }

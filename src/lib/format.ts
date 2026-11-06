@@ -50,3 +50,31 @@ export const fmtTimeHi = (d: Date | string) =>
 
 export const monthHi = (d: Date | string) =>
   new Intl.DateTimeFormat("hi-IN", { timeZone: tz, month: "short" }).format(new Date(d));
+
+// ---------- Calendar dates as "YYYY-MM-DD" keys (India time) ----------
+
+const IST_MS = 5.5 * 3600 * 1000;
+
+/** The India-time calendar date of a moment, e.g. "2026-11-08". */
+export const istDayKey = (d: Date = new Date()) => new Date(d.getTime() + IST_MS).toISOString().slice(0, 10);
+
+export const isDayKey = (s: string) => /^\d{4}-\d{2}-\d{2}$/.test(s) && new Date(`${s}T00:00:00Z`).toISOString().slice(0, 10) === s;
+
+export const addDays = (key: string, n: number) => {
+  const d = new Date(`${key}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+};
+
+/** First day of the month `n` months after the month of `key`. */
+export const addMonths = (key: string, n: number) => {
+  const d = new Date(`${key.slice(0, 7)}-01T00:00:00Z`);
+  d.setUTCMonth(d.getUTCMonth() + n);
+  return d.toISOString().slice(0, 10);
+};
+
+/** Midday IST of a day key, safe to format in any time zone. */
+export const dayKeyDate = (key: string) => new Date(`${key}T12:00:00+05:30`);
+
+/** "शनिवार, 8 नवंबर 2026" / "Sat, 8 November 2026" */
+export const fmtDayKey = (key: string, lang: "hi" | "en" = "hi") => (lang === "hi" ? fmtDateHi(dayKeyDate(key)) : fmtDate(dayKeyDate(key)));

@@ -10,6 +10,7 @@ Website, event ticketing and gate check-in system for **कुबेर मा�
 | Design & motion | Framer Motion + Lenis smooth scroll: arch hero that opens on scroll, pinned horizontal services, scroll-lit text, parallax/clip reveals, custom cursor, full-screen menu, film grain. Self-hosted fonts (Cormorant Garamond, Tiro Devanagari Hindi, Manrope, Mukta). Respects `prefers-reduced-motion` |
 | Social | **Instagram + Facebook feeds from the official Meta APIs, rendered in the site's own design: no widget, no third-party watermark.** Refreshed every 15 min; Instagram token auto-renewed weekly by cron |
 | Ticketing | Google login → choose ticket type & quantity → Razorpay (UPI/cards) → QR e-tickets by email + on the site. Free events work without payment. Seat holds, capacity race protection, webhook backup so tickets are issued even if the buyer closes the browser |
+| Show bookings | Public **availability calendar** (animated, free / booked / closed dates) on `/booking`. Customer picks a date → programme → location (admin list only, travel expense added) → admin-defined questions (price updates live) → contact → pays an **admin-set advance %** via Razorpay. Date is locked instantly; **no double booking** (one row per date in the DB + per-date lock). Receipt page, owner email/WhatsApp alert, customer email |
 | Gate check-in | `/admin/scan` on any phone: camera QR scan, green/amber/red full-screen result with sound + vibration. Signed QR codes (forgery-proof), atomic check-in (one entry per ticket even with several gates), manual code entry, wrong-event detection |
 | Admin panel | `/admin`: dashboard, events & ticket types, attendees, manual check-in, CSV export, resend tickets, bookings search, enquiries (call/WhatsApp), gallery uploads, YouTube videos, social tokens |
 | Notifications | Email via Resend: e-tickets to buyer, new-booking & new-enquiry alerts to owner, enquiry acknowledgement. WhatsApp click-to-chat everywhere |
@@ -108,6 +109,28 @@ The "Add to Google Wallet" / "Add to Apple Wallet" buttons appear automatically 
 3. Download Apple's **WWDR G4** certificate and convert: `openssl x509 -inform der -in AppleWWDRCAG4.cer -out wwdr.pem`.
 4. Paste the PEM contents into `APPLE_PASS_CERT`, `APPLE_PASS_KEY`, `APPLE_WWDR_CERT`, and the passphrase into `APPLE_PASS_KEY_PASSPHRASE`.
 
+## Show bookings (customer books Kuber ji for a date)
+
+**Setup, once:** Admin → **Booking Setup**
+1. *Quick start* loads the site's programmes (hidden, ₹0), Indore (₹0 travel) and a "how many people" question.
+2. **Advance %**: what the customer pays online to lock the date (0% = no online payment, bookings arrive as requests). Also minimum notice (days) and how many months ahead people can book.
+3. **Programmes**: base price for each, switch on the ones to show.
+4. **Locations**: every city you accept, with its travelling expense. Customers can only pick from this list.
+5. **Questions**: options with a price each (e.g. guests 100–500 +₹7,500), a number with a per-unit price (e.g. ₹2,000 per extra hour above 2), or plain text. A question can be limited to some programmes.
+
+**Price** = programme base price + location travel + extras from the answers. The server recalculates it from the database before charging; the browser figure is only a preview.
+
+**Day to day**
+- **Show Bookings**: *Needs action* lists requests to confirm and paid bookings whose date was taken meanwhile (refund or move them). Each booking: call / WhatsApp, confirm, move date, record payments (*Mark fully paid*), private note, cancel (frees the date).
+- **Calendar**: month view of booked, blocked and free dates. Block a single date or a range (holidays, offline bookings) with a private note; unblock any time. Published events from *Events & Tickets* also count as booked days.
+- Employees can be given *Show Bookings*, *Calendar* and *Booking Setup* separately in Team & Access.
+
+**How double booking is prevented:** `CalendarDay` has the date as its primary key, so the database refuses a second booking for the same date. Every change to a date also runs in a transaction holding a Postgres advisory lock for that date. While a customer is paying, the date is held for 15 minutes; if the payment comes after the hold expired and someone else took the date, the booking is marked *Paid, date taken* for you to refund or move, and the other booking is not touched.
+
+**Database:** the new tables create themselves on first use (like the Team table). To do it by hand, run the "Show bookings" part at the end of `prisma/supabase-setup.sql` in Supabase → SQL Editor, or `npx prisma db push`.
+
+Razorpay uses the same keys and webhook as ticketing. Without keys, online booking still works as "request, admin confirms".
+
 ## Event-day workflow
 1. Admin → Events → create event, add ticket types (price ₹0 = free pass) → set **Published**.
 2. Buyers get QR tickets by email and under *My Tickets*.
@@ -137,7 +160,7 @@ Don't put raw camera photos in `public/`: everything there ships with the site.
 
 - **Owner**: Gmail IDs in `ADMIN_EMAILS` (Vercel env). Always full access; cannot be removed from the panel.
 - **Co-owner**: added in **Admin → Team & Access**. Exactly the same rights as the owner, including adding/removing people.
-- **Employee**: added in the same page. Sees and can use only the sections ticked for them (Dashboard, Events, Bookings, Scan, Enquiries, Gallery, Videos, Testimonials, Social, WhatsApp, Email). Everything else is hidden in the menu and blocked on the server.
+- **Employee**: added in the same page. Sees and can use only the sections ticked for them (Dashboard, Events, Bookings, Scan, Enquiries, Show Bookings, Calendar, Booking Setup, Gallery, Videos, Testimonials, Social, WhatsApp, Email). Everything else is hidden in the menu and blocked on the server.
 
 Everyone signs in with Google using the exact Gmail address that was added. Rights are checked on every admin page and action, so changes and removals apply immediately. Nobody can change or remove their own access.
 

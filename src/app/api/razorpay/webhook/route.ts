@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyWebhookSignature } from "@/lib/razorpay";
 import { fulfilBooking } from "@/lib/tickets";
+import { confirmShowPayment, markFailed } from "@/lib/show-booking";
 
 /**
  * Razorpay → Dashboard → Webhooks → URL: https://<domain>/api/razorpay/webhook
@@ -19,7 +20,7 @@ export async function POST(req: Request) {
   if (!orderId) return NextResponse.json({ ok: true });
 
   const booking = await prisma.booking.findUnique({ where: { razorpayOrderId: orderId } });
-  if (!booking) return NextResponse.json({ ok: true });
+  if (!booking) return handleShowBooking(evt.event, orderId, payment);
 
   if (evt.event === "payment.captured" || evt.event === "order.paid") {
     if (payment?.amount && payment.amount !== booking.amount) {
@@ -29,6 +30,22 @@ export async function POST(req: Request) {
     await fulfilBooking(booking.id, payment?.id);
   } else if (evt.event === "payment.failed" && booking.status === "PENDING") {
     await prisma.booking.update({ where: { id: booking.id }, data: { status: "FAILED" } });
+  }
+  return NextResponse.json({ ok: true });
+}
+
+/** Advance payments for show (date) bookings. */
+async function handleShowBooking(event: string, orderId: string, payment?: { id?: string; amount?: number }) {
+  const show = await prisma.showBooking.findUnique({ where: { razorpayOrderId: orderId } }).catch(() => null);
+  if (!show) return NextResponse.json({ ok: true });
+  if (event === "payment.captured" || event === "order.paid") {
+    if (payment?.amount && payment.amount !== show.advanceAmount) {
+      console.error("[webhook] show booking amount mismatch", orderId);
+      return NextResponse.json({ ok: false }, { status: 200 });
+    }
+    await confirmShowPayment(show.id, payment?.id);
+  } else if (event === "payment.failed" && show.status === "PENDING") {
+    await markFailed(show.id);
   }
   return NextResponse.json({ ok: true });
 }

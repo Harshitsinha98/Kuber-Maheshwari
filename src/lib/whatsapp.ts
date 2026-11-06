@@ -153,6 +153,27 @@ export async function whatsappBookingAlerts(bookingId: string) {
   }
 }
 
+/** Show booking (date booking) alert to the owners, reusing the approved "booking" template. */
+export async function whatsappShowBookingAlert(b: {
+  date: string;
+  status: string;
+  serviceName: string;
+  locationName: string;
+  name: string;
+  phone: string;
+  total: number;
+  paidAmount: number;
+}) {
+  const label = { CONFIRMED: "पक्की", REQUESTED: "अनुरोध, कन्फर्म करें", CONFLICT: "⚠️ तारीख पहले से बुक, रिफंड/बदलें" }[b.status] ?? b.status;
+  await toOwners("booking", [
+    `${b.serviceName} · ${shortDate(new Date(`${b.date}T12:00:00+05:30`))}`,
+    b.name,
+    b.phone,
+    `आयोजन बुकिंग (${label}) · ${b.locationName}`,
+    `अग्रिम ${b.paidAmount ? rupees(b.paidAmount) : "₹0"} / कुल ${rupees(b.total)}`,
+  ]);
+}
+
 export async function whatsappEnquiryAlert(e: { name: string; phone: string; eventType: string; eventDate?: string | null; city?: string | null }) {
   await toOwners("enquiry", [e.name, e.phone, e.eventType, [e.eventDate, e.city].filter(Boolean).join(" · ") || "—"]);
 }

@@ -250,3 +250,127 @@ CREATE TABLE "TeamMember" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "TeamMember_email_key" ON "TeamMember"("email");
+
+-- ---------- Show bookings: calendar, pricing, advance payments ----------
+-- CreateEnum
+CREATE TYPE "ShowBookingStatus" AS ENUM ('PENDING', 'CONFIRMED', 'REQUESTED', 'CONFLICT', 'FAILED', 'CANCELLED');
+
+-- CreateEnum
+CREATE TYPE "CalendarDayKind" AS ENUM ('HOLD', 'BOOKED', 'BLOCKED');
+
+-- CreateEnum
+CREATE TYPE "QuestionKind" AS ENUM ('CHOICE', 'NUMBER', 'TEXT');
+
+-- CreateTable
+CREATE TABLE "BookingService" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "nameHi" TEXT,
+    "description" TEXT,
+    "basePrice" INTEGER NOT NULL DEFAULT 0,
+    "active" BOOLEAN NOT NULL DEFAULT true,
+    "sortOrder" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "BookingService_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "BookingLocation" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "travelCost" INTEGER NOT NULL DEFAULT 0,
+    "note" TEXT,
+    "active" BOOLEAN NOT NULL DEFAULT true,
+    "sortOrder" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "BookingLocation_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "BookingQuestion" (
+    "id" TEXT NOT NULL,
+    "label" TEXT NOT NULL,
+    "labelHi" TEXT,
+    "help" TEXT,
+    "kind" "QuestionKind" NOT NULL DEFAULT 'CHOICE',
+    "required" BOOLEAN NOT NULL DEFAULT true,
+    "options" JSONB NOT NULL DEFAULT '[]',
+    "unitPrice" INTEGER NOT NULL DEFAULT 0,
+    "freeUnits" INTEGER NOT NULL DEFAULT 0,
+    "minValue" INTEGER,
+    "maxValue" INTEGER,
+    "serviceIds" TEXT[] DEFAULT ARRAY[]::TEXT[],
+    "active" BOOLEAN NOT NULL DEFAULT true,
+    "sortOrder" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "BookingQuestion_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "CalendarDay" (
+    "date" TEXT NOT NULL,
+    "kind" "CalendarDayKind" NOT NULL,
+    "bookingId" TEXT,
+    "holdUntil" TIMESTAMP(3),
+    "note" TEXT,
+    "createdBy" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "CalendarDay_pkey" PRIMARY KEY ("date")
+);
+
+-- CreateTable
+CREATE TABLE "ShowBooking" (
+    "id" TEXT NOT NULL,
+    "ref" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "serviceId" TEXT,
+    "serviceName" TEXT NOT NULL,
+    "locationId" TEXT,
+    "locationName" TEXT NOT NULL,
+    "venue" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "phone" TEXT NOT NULL,
+    "email" TEXT,
+    "message" TEXT,
+    "answers" JSONB NOT NULL DEFAULT '[]',
+    "basePrice" INTEGER NOT NULL,
+    "travelCost" INTEGER NOT NULL,
+    "extrasPrice" INTEGER NOT NULL,
+    "total" INTEGER NOT NULL,
+    "advancePercent" INTEGER NOT NULL,
+    "advanceAmount" INTEGER NOT NULL,
+    "paidAmount" INTEGER NOT NULL DEFAULT 0,
+    "status" "ShowBookingStatus" NOT NULL DEFAULT 'PENDING',
+    "razorpayOrderId" TEXT,
+    "razorpayPaymentId" TEXT,
+    "adminNote" TEXT,
+    "notifiedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ShowBooking_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "CalendarDay_bookingId_key" ON "CalendarDay"("bookingId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ShowBooking_ref_key" ON "ShowBooking"("ref");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ShowBooking_razorpayOrderId_key" ON "ShowBooking"("razorpayOrderId");
+
+-- CreateIndex
+CREATE INDEX "ShowBooking_date_idx" ON "ShowBooking"("date");
+
+-- CreateIndex
+CREATE INDEX "ShowBooking_status_idx" ON "ShowBooking"("status");
+

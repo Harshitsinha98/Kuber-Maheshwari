@@ -202,3 +202,114 @@ model Setting {
   value     String   @db.Text
   updatedAt DateTime @updatedAt
 }
+
+// ---------- Show bookings (customer books Kuber ji for a date) ----------
+// Everything below is set up by the owner in Admin → Booking Setup. Money is in paise.
+
+enum ShowBookingStatus {
+  PENDING // waiting for the advance payment (date is held for a few minutes)
+  CONFIRMED // advance paid or confirmed by admin: the date is booked
+  REQUESTED // no online advance (0% or payments off): admin must confirm
+  CONFLICT // money received but the date was taken meanwhile: admin must refund or move it
+  FAILED
+  CANCELLED
+}
+
+enum CalendarDayKind {
+  HOLD // a customer is paying right now (expires at holdUntil)
+  BOOKED // a confirmed show booking
+  BLOCKED // closed manually by admin
+}
+
+enum QuestionKind {
+  CHOICE // pick one option, each option can add a price
+  NUMBER // a number (e.g. guests); price per unit above the free units
+  TEXT // free text, no price
+}
+
+model BookingService {
+  id          String   @id @default(cuid())
+  name        String
+  nameHi      String?
+  description String?
+  basePrice   Int      @default(0)
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model BookingLocation {
+  id         String   @id @default(cuid())
+  name       String // city / area shown to the customer
+  travelCost Int      @default(0) // travelling expense added to the price
+  note       String?
+  active     Boolean  @default(true)
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model BookingQuestion {
+  id         String       @id @default(cuid())
+  label      String
+  labelHi    String?
+  help       String?
+  kind       QuestionKind @default(CHOICE)
+  required   Boolean      @default(true)
+  options    Json         @default("[]") // CHOICE: [{ id, label, price }]
+  unitPrice  Int          @default(0) // NUMBER: price per unit
+  freeUnits  Int          @default(0) // NUMBER: units included in the base price
+  minValue   Int?
+  maxValue   Int?
+  serviceIds String[]     @default([]) // empty = asked for every service
+  active     Boolean      @default(true)
+  sortOrder  Int          @default(0)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+}
+
+// One row per date at most (primary key), so a date can never be booked twice.
+model CalendarDay {
+  date      String          @id // "YYYY-MM-DD" (India time)
+  kind      CalendarDayKind
+  bookingId String?         @unique
+  holdUntil DateTime?
+  note      String?
+  createdBy String?
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+}
+
+model ShowBooking {
+  id                String            @id @default(cuid())
+  ref               String            @unique // short code shown to the customer, e.g. KM-1108-7F3K
+  date              String // "YYYY-MM-DD"
+  serviceId         String?
+  serviceName       String // snapshot, so later price/name edits don't change old bookings
+  locationId        String?
+  locationName      String
+  venue             String            @db.Text
+  name              String
+  phone             String
+  email             String?
+  message           String?           @db.Text
+  answers           Json              @default("[]") // [{ question, answer, price }]
+  basePrice         Int
+  travelCost        Int
+  extrasPrice       Int
+  total             Int
+  advancePercent    Int
+  advanceAmount     Int
+  paidAmount        Int               @default(0)
+  status            ShowBookingStatus @default(PENDING)
+  razorpayOrderId   String?           @unique
+  razorpayPaymentId String?
+  adminNote         String?           @db.Text
+  notifiedAt        DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([date])
+  @@index([status])
+}
