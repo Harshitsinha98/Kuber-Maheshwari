@@ -11,7 +11,7 @@ export const site = {
   // Official handles (from his Instagram bio). Env vars can still override them.
   social: {
     instagram: process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/kuber_maheshwari_bhajan",
-    facebook: process.env.NEXT_PUBLIC_FACEBOOK_URL || "https://www.facebook.com/share/1Jsdo4T7GF/",
+    facebook: process.env.NEXT_PUBLIC_FACEBOOK_URL || "https://www.facebook.com/kuber.maheshwari.official",
     youtube: process.env.NEXT_PUBLIC_YOUTUBE_URL || "https://www.youtube.com/@KuberMaheshwariBhajan",
   },
   keywords: [
