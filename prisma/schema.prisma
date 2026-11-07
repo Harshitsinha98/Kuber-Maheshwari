@@ -284,6 +284,7 @@ model CalendarDay {
 model ShowBooking {
   id                String            @id @default(cuid())
   ref               String            @unique // short code shown to the customer, e.g. KM-1108-7F3K
+  userId            String? // Google account that booked (shown under My Account)
   date              String // "YYYY-MM-DD"
   serviceId         String?
   serviceName       String // snapshot, so later price/name edits don't change old bookings
@@ -312,4 +313,5 @@ model ShowBooking {
 
   @@index([date])
   @@index([status])
+  @@index([userId])
 }

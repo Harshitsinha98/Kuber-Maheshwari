@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ensureBookingTables } from "@/lib/booking-tables";
 import { fmtDayKey, inr } from "@/lib/format";
@@ -23,9 +24,11 @@ const copy: Record<string, { hi: string; en: string; tone: string }> = {
 
 export default async function ShowBookingReceipt({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const s = await getSession();
+  if (!s) redirect(`/login?callbackUrl=/booking/${id}`);
   await ensureBookingTables().catch(() => {});
   const b = await prisma.showBooking.findUnique({ where: { id } }).catch(() => null);
-  if (!b) notFound();
+  if (!b || (b.userId !== s.user.id && !(s.user.perms ?? []).includes("showbookings"))) notFound();
   const c = copy[b.status] ?? copy.PENDING;
   const answers = Array.isArray(b.answers) ? (b.answers as { question: string; answer: string }[]) : [];
   const balance = Math.max(0, b.total - b.paidAmount);
@@ -89,7 +92,9 @@ export default async function ShowBookingReceipt({ params }: { params: Promise<{
                 फिर से बुक करें
               </Link>
             )}
-            <p className="text-center text-xs text-muted">Save this page link to check your booking any time.</p>
+            <Link href="/my-tickets" className="block text-center text-xs text-muted hover:text-gold">
+              Your bookings are always under My Account →
+            </Link>
           </div>
         </div>
       </Reveal>

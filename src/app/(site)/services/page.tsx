@@ -26,10 +26,10 @@ function Actions({ s, light = false }: { s: Service; light?: boolean }) {
   return (
     <div className="mt-7 flex flex-wrap gap-3">
       <Link
-        href={`/booking?type=${encodeURIComponent(s.en)}`}
+        href={`/booking?type=${encodeURIComponent(s.en)}#book`}
         className="inline-flex h-12 items-center rounded-full bg-saffron px-6 text-xs font-semibold uppercase tracking-[0.16em] text-night transition-colors hover:bg-marigold"
       >
-        Enquire
+        Book now
       </Link>
       <a
         href={waLink(`नमस्ते, मुझे ${s.hi} (${s.en}) के लिए जानकारी चाहिए।`)}

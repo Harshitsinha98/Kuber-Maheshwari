@@ -36,7 +36,7 @@ const TABLES = [
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL,
     CONSTRAINT "CalendarDay_pkey" PRIMARY KEY ("date"))`,
   `CREATE TABLE IF NOT EXISTS "ShowBooking" (
-    "id" TEXT NOT NULL, "ref" TEXT NOT NULL, "date" TEXT NOT NULL,
+    "id" TEXT NOT NULL, "ref" TEXT NOT NULL, "userId" TEXT, "date" TEXT NOT NULL,
     "serviceId" TEXT, "serviceName" TEXT NOT NULL, "locationId" TEXT, "locationName" TEXT NOT NULL, "venue" TEXT NOT NULL,
     "name" TEXT NOT NULL, "phone" TEXT NOT NULL, "email" TEXT, "message" TEXT, "answers" JSONB NOT NULL DEFAULT '[]',
     "basePrice" INTEGER NOT NULL, "travelCost" INTEGER NOT NULL, "extrasPrice" INTEGER NOT NULL, "total" INTEGER NOT NULL,
@@ -52,12 +52,20 @@ const TABLES = [
   `CREATE INDEX IF NOT EXISTS "ShowBooking_status_idx" ON "ShowBooking"("status")`,
 ];
 
+// Columns added after the first release. Safe to run on every start.
+const UPGRADES = [
+  `ALTER TABLE "ShowBooking" ADD COLUMN IF NOT EXISTS "userId" TEXT`,
+  `CREATE INDEX IF NOT EXISTS "ShowBooking_userId_idx" ON "ShowBooking"("userId")`,
+];
+
 async function create() {
   const [{ ok }] = await prisma.$queryRaw<{ ok: boolean }[]>`SELECT to_regclass('public."ShowBooking"') IS NOT NULL
     AND to_regclass('public."CalendarDay"') IS NOT NULL AND to_regclass('public."BookingQuestion"') IS NOT NULL AS ok`;
-  if (ok) return;
-  for (const e of ENUMS) await prisma.$executeRawUnsafe(`DO $$ BEGIN ${e}; EXCEPTION WHEN duplicate_object THEN NULL; END $$`);
-  for (const t of TABLES) await prisma.$executeRawUnsafe(t);
+  if (!ok) {
+    for (const e of ENUMS) await prisma.$executeRawUnsafe(`DO $$ BEGIN ${e}; EXCEPTION WHEN duplicate_object THEN NULL; END $$`);
+    for (const t of TABLES) await prisma.$executeRawUnsafe(t);
+  }
+  for (const u of UPGRADES) await prisma.$executeRawUnsafe(u);
 }
 
 let ready: Promise<void> | null = null;

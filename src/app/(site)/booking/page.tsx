@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Book Kuber Maheshwari for your event",
-  description: "Check Kuber Maheshwari's available dates and book Sundarkand, Bhajan Sandhya, Bhajan Clubbing, Jagran, Kirtan or weddings online, or send an enquiry, call or WhatsApp.",
+  description: "Check Kuber Maheshwari's available dates and book Sundarkand, Bhajan Sandhya, Bhajan Clubbing, Jagran, Kirtan or weddings online, or call / WhatsApp.",
 };
 
 // Only facts from Kuber ji's own profile.
@@ -34,7 +34,7 @@ const enquirySteps = [
 
 const onlineSteps = [
   ["01", "तारीख चुनें", "कैलेंडर में खाली तारीख देखें और चुनें।"],
-  ["02", "विवरण भरें", "कार्यक्रम, स्थान और आयोजन की जानकारी। कीमत तुरंत दिखेगी।"],
+  ["02", "विवरण भरें", "Google से लॉग-इन करें, फिर कार्यक्रम, स्थान और आयोजन की जानकारी। कीमत तुरंत दिखेगी।"],
   ["03", "तारीख पक्की", "अग्रिम राशि ऑनलाइन दें, तारीख उसी समय आपके नाम।"],
 ];
 

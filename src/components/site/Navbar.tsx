@@ -15,7 +15,7 @@ const links = [
   { href: "/events", label: "Events", hi: "कार्यक्रम", img: "/images/gallery/kuber-46.webp" },
   { href: "/gallery", label: "Gallery", hi: "झलकियाँ", img: "/images/gallery/kuber-15.webp" },
   { href: "/videos", label: "Videos", hi: "वीडियो", img: "/images/gallery/kuber-41.webp" },
-  { href: "/booking", label: "Book Kuber Ji", hi: "आमंत्रण", img: "/images/gallery/kuber-48.webp" },
+  { href: "/booking", label: "Booking", hi: "बुकिंग", img: "/images/gallery/kuber-48.webp" },
   { href: "/contact", label: "Contact", hi: "संपर्क", img: "/images/gallery/kuber-27.webp" },
 ];
 
@@ -61,10 +61,10 @@ export default function Navbar() {
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-9 text-[13px] uppercase tracking-[0.18em] text-ivory/80 lg:flex">
-            {links.slice(1, 6).map((l) => (
+          <nav className="hidden items-center gap-7 text-[13px] xl:gap-9 uppercase tracking-[0.18em] text-ivory/80 lg:flex">
+            {links.slice(1, 7).map((l) => (
               <Link key={l.href} href={l.href} className="group relative py-2">
-                <span className={pathname.startsWith(l.href) ? "text-gold" : "group-hover:text-ivory"}>{l.label}</span>
+                <span className={pathname === l.href || pathname.startsWith(`${l.href}/`) ? "text-gold" : "group-hover:text-ivory"}>{l.label}</span>
                 <span className="absolute bottom-0 left-0 h-px w-full origin-right scale-x-0 bg-gold transition-transform duration-500 group-hover:origin-left group-hover:scale-x-100" />
               </Link>
             ))}
@@ -75,7 +75,7 @@ export default function Navbar() {
               href={session ? "/my-tickets" : "/login"}
               className="hidden text-[12px] uppercase tracking-[0.18em] text-ivory/70 hover:text-gold md:block"
             >
-              {session ? "My Tickets" : "Sign in"}
+              {session ? "My Account" : "Sign in"}
             </Link>
             <Link
               href="/booking"
