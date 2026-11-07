@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import PageHeader from "@/components/site/PageHeader";
-import EnquiryForm from "@/components/site/EnquiryForm";
 import { Reveal } from "@/components/motion/Reveal";
 import { site, waLink } from "@/lib/site";
 import { FacebookIcon, InstagramIcon, WhatsappIcon, YoutubeIcon } from "@/components/site/Icons";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: `Contact Kuber Maheshwari, Indore: ${site.phones.map((p) => p.display).join(", ")}. WhatsApp, call or send an enquiry.`,
+  description: `Contact Kuber Maheshwari, Indore: ${site.phones.map((p) => p.display).join(", ")}. WhatsApp, call, or check available dates and book online.`,
 };
 
 export default function Contact() {
@@ -50,12 +50,20 @@ export default function Contact() {
       </section>
       <section className="mx-auto grid max-w-[1500px] gap-16 px-5 py-28 md:px-10 lg:grid-cols-2">
         <Reveal>
-          <h2 className="font-display text-5xl leading-none md:text-6xl">
-            Send a <span className="italic text-gold">message</span>
+          <p className="font-hindi text-lg text-saffron">आयोजन बुकिंग</p>
+          <h2 className="mt-2 font-display text-5xl leading-none md:text-6xl">
+            Book <span className="italic text-gold">Kuber ji</span>
           </h2>
-          <p className="mt-4 text-muted">We usually reply within a few hours.</p>
-          <div className="mt-10">
-            <EnquiryForm />
+          <p className="mt-4 max-w-lg text-muted">
+            See which dates are free on the calendar, choose your programme and venue, get the price instantly and pay a small advance online to lock your date.
+          </p>
+          <div className="mt-10 flex flex-wrap gap-3">
+            <Link href="/booking#book" className="inline-flex h-14 items-center rounded-full bg-saffron px-8 font-hindi text-lg font-semibold text-night transition-colors hover:bg-marigold">
+              तारीख देखें, बुक करें
+            </Link>
+            <Link href="/events" className="inline-flex h-14 items-center rounded-full border border-ivory/20 px-8 text-sm uppercase tracking-[0.16em] text-ivory hover:border-gold hover:text-gold">
+              Event tickets
+            </Link>
           </div>
         </Reveal>
         <Reveal delay={0.1}>

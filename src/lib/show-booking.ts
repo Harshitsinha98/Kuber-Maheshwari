@@ -164,6 +164,8 @@ async function putOnDay(tx: Tx, date: string, bookingId: string, kind: "HOLD" | 
 // ---------- Customer flow ----------
 
 export type CreateInput = {
+  userId: string;
+  email: string; // the signed-in Google account; confirmations go here
   date: string;
   serviceId: string;
   locationId: string;
@@ -171,7 +173,6 @@ export type CreateInput = {
   answers: Answers;
   name: string;
   phone: string;
-  email?: string;
   message?: string;
 };
 
@@ -212,6 +213,7 @@ export async function createShowBooking(input: CreateInput) {
         b = await tx.showBooking.create({
           data: {
             ref: newRef(input.date),
+            userId: input.userId,
             date: input.date,
             serviceId: service.id,
             serviceName: service.nameHi ? `${service.nameHi} (${service.name})` : service.name,
@@ -220,7 +222,7 @@ export async function createShowBooking(input: CreateInput) {
             venue: input.venue,
             name: input.name,
             phone: input.phone,
-            email: input.email || null,
+            email: input.email,
             message: input.message || null,
             answers: q.answers,
             basePrice: q.base,
@@ -290,10 +292,10 @@ export async function markFailed(id: string) {
 }
 
 /** Customer closed the payment window and changed their choices: free the date if nothing was paid. */
-export async function releaseHold(id: string) {
+export async function releaseHold(id: string, userId: string) {
   await ensureBookingTables();
   const b = await prisma.showBooking.findUnique({ where: { id } });
-  if (!b || b.status !== "PENDING") return;
+  if (!b || b.userId !== userId || b.status !== "PENDING") return;
   if (b.razorpayOrderId) {
     const payments = (await razorpay().orders.fetchPayments(b.razorpayOrderId).catch(() => null)) as { items?: { status: string; id: string }[] } | null;
     if (!payments) return; // can't tell: keep the hold, it expires by itself

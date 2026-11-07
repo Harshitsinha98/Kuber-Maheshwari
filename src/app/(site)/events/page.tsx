@@ -34,8 +34,8 @@ export default async function Events() {
             <div className="border-y border-ivory/10 py-20 text-center">
               <p className="font-display text-4xl italic text-ivory/80">No public events announced right now.</p>
               <p className="mt-3 text-muted">Follow on social media for new dates, or invite Kuber ji to your event.</p>
-              <Link href="/booking" className="mt-8 inline-flex h-12 items-center rounded-full bg-saffron px-7 text-xs font-semibold uppercase tracking-[0.2em] text-night">
-                Send an enquiry
+              <Link href="/booking#book" className="mt-8 inline-flex h-12 items-center rounded-full bg-saffron px-7 text-xs font-semibold uppercase tracking-[0.2em] text-night">
+                Book Kuber ji
               </Link>
             </div>
           </Reveal>

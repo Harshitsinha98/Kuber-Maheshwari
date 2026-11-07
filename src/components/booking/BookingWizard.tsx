@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, animate, motion, type Variants } from "framer-motion";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { monthCells } from "@/lib/calendar-grid";
@@ -52,6 +53,15 @@ const STEP_LABEL: Record<StepKey, [string, string]> = {
   review: ["पुष्टि", "Confirm"],
 };
 
+const GoogleG = () => (
+  <svg viewBox="0 0 48 48" className="h-5 w-5" aria-hidden>
+    <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z" />
+    <path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
+    <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z" />
+    <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z" />
+  </svg>
+);
+
 /** Smoothly counts to the new amount. */
 function Amount({ paise, className = "" }: { paise: number; className?: string }) {
   const [v, setV] = useState(paise);
@@ -63,6 +73,9 @@ function Amount({ paise, className = "" }: { paise: number; className?: string }
   }, [paise]);
   return <span className={`[font-variant-numeric:lining-nums_tabular-nums] ${className}`}>{inr(v)}</span>;
 }
+
+const DRAFT_KEY = "km-booking-draft";
+type Draft = { at: number; date: string | null; serviceId: string | null; locationId: string | null; venue: string; answers: Answers; name: string; phone: string; message: string };
 
 const phoneOk = (p: string) => /^[6-9]\d{9}$/.test(p.replace(/\D/g, "").slice(-10));
 
@@ -87,6 +100,24 @@ export default function BookingWizard({
 }) {
   const router = useRouter();
   const rootRef = useRef<HTMLDivElement>(null);
+  const { data: session, status: authStatus } = useSession();
+  const account = authStatus === "authenticated" ? session?.user?.email ?? null : null;
+  const [needLogin, setNeedLogin] = useState(false);
+  const loginRef = useRef<HTMLDivElement>(null);
+  // The prompt sits under the calendar: bring it on screen when it appears.
+  useEffect(() => {
+    if (!needLogin) return;
+    const t = setTimeout(() => {
+      const el = loginRef.current;
+      if (!el) return;
+      const lenis = (window as unknown as { lenis?: { scrollTo: (t: HTMLElement, o?: object) => void } }).lenis;
+      const r = el.getBoundingClientRect();
+      if (r.top >= 0 && r.bottom <= window.innerHeight) return;
+      if (lenis) lenis.scrollTo(el, { offset: -window.innerHeight / 3 });
+      else el.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 150);
+    return () => clearTimeout(t);
+  }, [needLogin]);
 
   const [month, setMonth] = useState(win.first.slice(0, 7));
   const [monthDir, setMonthDir] = useState(1);
@@ -102,7 +133,7 @@ export default function BookingWizard({
   const [locationId, setLocationId] = useState<string | null>(locations.length === 1 ? locations[0].id : null);
   const [venue, setVenue] = useState("");
   const [answers, setAnswers] = useState<Answers>({});
-  const [contact, setContact] = useState({ name: "", phone: "", email: "", message: "", website: "" });
+  const [contact, setContact] = useState({ name: "", phone: "", message: "", website: "" });
 
   const [stepIdx, setStepIdx] = useState(0);
   const [dir, setDir] = useState(1);
@@ -150,6 +181,10 @@ export default function BookingWizard({
   // ---------- navigation ----------
   const go = (to: number) => {
     setErr(null);
+    if (to > 0 && !account) {
+      setNeedLogin(true);
+      return;
+    }
     setDir(to > stepIdx ? 1 : -1);
     setStepIdx(Math.max(0, Math.min(steps.length - 1, to)));
     const el = rootRef.current;
@@ -166,17 +201,67 @@ export default function BookingWizard({
   };
   useEffect(() => () => void (autoNext.current && clearTimeout(autoNext.current)), []);
 
+  // ---------- Google login (required to book) ----------
+  /** Saves the choices so far, signs in with Google and comes back to this step. */
+  const startLogin = () => {
+    const d: Draft = { at: Date.now(), date, serviceId, locationId, venue, answers, name: contact.name, phone: contact.phone, message: contact.message };
+    try {
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+    } catch {}
+    signIn("google", { callbackUrl: `${window.location.pathname}${window.location.search}#book` });
+  };
+
+  // Back from Google: restore the draft and continue where the customer was.
+  const restored = useRef(false);
+  useEffect(() => {
+    if (!account || restored.current) return;
+    restored.current = true;
+    let d: Draft | null = null;
+    try {
+      d = JSON.parse(sessionStorage.getItem(DRAFT_KEY) || "null");
+      sessionStorage.removeItem(DRAFT_KEY);
+    } catch {}
+    const name = session?.user?.name || "";
+    if (!d || Date.now() - d.at > 3600_000) {
+      if (name) setContact((c) => (c.name ? c : { ...c, name }));
+      return;
+    }
+    if (d.date && d.date >= win.first && d.date <= win.last) {
+      setDate(d.date);
+      setMonth(d.date.slice(0, 7));
+    }
+    if (d.serviceId && services.some((x) => x.id === d.serviceId)) setServiceId(d.serviceId);
+    if (d.locationId && locations.some((x) => x.id === d.locationId)) setLocationId(d.locationId);
+    setVenue(d.venue || "");
+    setAnswers(d.answers || {});
+    setContact((c) => ({ ...c, name: d.name || name, phone: d.phone || "", message: d.message || "" }));
+    if (d.date && d.date >= win.first && d.date <= win.last) {
+      setDir(1);
+      setStepIdx(1);
+    }
+    // The site scrolls to the top on page load; bring the customer back to the booking form.
+    setTimeout(() => {
+      const el = rootRef.current;
+      if (!el) return;
+      const lenis = (window as unknown as { lenis?: { scrollTo: (t: HTMLElement, o?: object) => void } }).lenis;
+      if (lenis) lenis.scrollTo(el, { offset: -100, immediate: true });
+      else el.scrollIntoView({ block: "start" });
+    }, 400);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [account]);
+
   const problem = (s: StepKey): string | null => {
     if (s === "date") return date ? null : "कृपया एक उपलब्ध तारीख चुनें।";
     if (s === "service") return service ? null : "कृपया कार्यक्रम चुनें।";
     if (s === "location") return !location ? "कृपया स्थान चुनें।" : venue.trim().length < 5 ? "कृपया आयोजन स्थल का पूरा पता लिखें।" : null;
     if (s === "details") return checkAnswers(qs, answers);
-    if (s === "contact") return contact.name.trim().length < 2 ? "कृपया अपना नाम लिखें।" : !phoneOk(contact.phone) ? "कृपया सही 10 अंकों का मोबाइल नंबर लिखें।" : contact.email && !/^\S+@\S+\.\S+$/.test(contact.email) ? "कृपया सही ईमेल लिखें।" : null;
+    if (s === "contact") return contact.name.trim().length < 2 ? "कृपया अपना नाम लिखें।" : !phoneOk(contact.phone) ? "कृपया सही 10 अंकों का मोबाइल नंबर लिखें।" : null;
     return null;
   };
   const next = () => {
     const p = problem(step);
     if (p) return setErr(p);
+    if (!account) return startLogin();
     go(stepIdx + 1);
   };
   const maxReachable = (() => {
@@ -194,7 +279,6 @@ export default function BookingWizard({
     answers: Object.fromEntries(qs.map((x) => [x.id, answers[x.id] ?? ""]).filter(([, v]) => v !== "")),
     name: contact.name.trim(),
     phone: contact.phone,
-    email: contact.email.trim(),
     message: contact.message.trim(),
     website: contact.website,
   };
@@ -210,7 +294,7 @@ export default function BookingWizard({
       name: site.name,
       description: `Advance · ${service?.name} · ${date}`,
       image: "/images/brand/km-logo.png",
-      prefill: { name: body.name, email: body.email || undefined, contact: body.phone },
+      prefill: { name: body.name, email: account || undefined, contact: body.phone },
       notes: { date },
       theme: { color: "#E8820C" },
       handler: async (r: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
@@ -247,6 +331,7 @@ export default function BookingWizard({
       }
       const res = await fetch("/api/show-bookings", { method: "POST", headers: { "Content-Type": "application/json" }, body: fp });
       const data = await res.json().catch(() => ({}));
+      if (res.status === 401) return startLogin();
       if (res.status === 409 && date) {
         // Someone else got this date a moment ago: refresh the calendar and send the customer back to it.
         await loadMonth(date.slice(0, 7), true);
@@ -331,6 +416,29 @@ export default function BookingWizard({
                       nextSoon(0);
                     }}
                   />
+                  <AnimatePresence>
+                    {date && !account && needLogin && (
+                      <motion.div
+                        ref={loginRef}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        className="mt-6 rounded-2xl border border-gold/30 bg-gold/[0.06] p-5"
+                      >
+                        <p className="font-hindi text-xl text-ivory">बुकिंग के लिए Google से लॉग-इन करें</p>
+                        <p className="mt-1 text-sm text-ivory/65">
+                          Your booking, receipt and confirmation email stay safe in your account (My Account). Your chosen date {fmtDayKey(date, "en")} is remembered.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={startLogin}
+                          className="mt-4 inline-flex h-12 items-center gap-3 rounded-full bg-ivory px-6 text-sm font-semibold text-night transition-transform hover:scale-[1.02]"
+                        >
+                          <GoogleG /> Continue with Google
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                   {rules.minNoticeDays > 0 && (
                     <p className="mt-4 text-xs text-muted">
                       Online booking opens {rules.minNoticeDays} day{rules.minNoticeDays > 1 ? "s" : ""} ahead. For an earlier date please{" "}
@@ -498,7 +606,9 @@ export default function BookingWizard({
                   <div className="grid gap-x-8 gap-y-2 md:grid-cols-2">
                     <input className="field" placeholder="आपका नाम / Your name *" value={contact.name} onChange={(e) => setContact((c) => ({ ...c, name: e.target.value }))} autoComplete="name" maxLength={80} />
                     <input className="field" placeholder="मोबाइल नंबर / Mobile *" inputMode="tel" value={contact.phone} onChange={(e) => setContact((c) => ({ ...c, phone: e.target.value }))} autoComplete="tel" maxLength={16} />
-                    <input className="field md:col-span-2" type="email" placeholder="ईमेल (वैकल्पिक) / Email for the confirmation" value={contact.email} onChange={(e) => setContact((c) => ({ ...c, email: e.target.value }))} autoComplete="email" />
+                    <p className="py-3 text-sm text-ivory/60 md:col-span-2">
+                      पुष्टि ईमेल / Confirmation email: <span className="text-ivory">{account}</span>
+                    </p>
                     <textarea className="field md:col-span-2" rows={2} placeholder="कुछ और बताना चाहें? (वैकल्पिक)" value={contact.message} onChange={(e) => setContact((c) => ({ ...c, message: e.target.value }))} maxLength={1000} />
                     <input type="text" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden value={contact.website} onChange={(e) => setContact((c) => ({ ...c, website: e.target.value }))} />
                   </div>
@@ -515,7 +625,7 @@ export default function BookingWizard({
                       ["कार्यक्रम", service ? service.nameHi || service.name : "", 1],
                       ["स्थान", `${location?.name ?? ""}\n${venue}`, 2],
                       ...q.answers.map((a) => [a.question, a.answer, 3] as const),
-                      ["संपर्क", `${contact.name} · ${contact.phone}${contact.email ? ` · ${contact.email}` : ""}`, steps.indexOf("contact")],
+                      ["संपर्क", `${contact.name} · ${contact.phone}${account ? ` · ${account}` : ""}`, steps.indexOf("contact")],
                     ].map(([k, v, s]) => (
                       <div key={String(k)} className="flex items-start gap-4 px-5 py-3">
                         <dt className="w-28 shrink-0 font-hindi text-sm text-muted">{k}</dt>
@@ -560,7 +670,7 @@ export default function BookingWizard({
             </button>
           ) : (
             <button type="button" onClick={next} className="inline-flex h-12 items-center gap-2 rounded-full bg-saffron px-8 font-hindi text-lg font-semibold text-night transition-colors hover:bg-marigold">
-              आगे <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M9 18l6-6-6-6" /></svg>
+              {step === "date" && !account ? "लॉग-इन करके आगे" : "आगे"} <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M9 18l6-6-6-6" /></svg>
             </button>
           )}
         </div>

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { getSession } from "@/lib/auth";
 import { BookingError, createShowBooking } from "@/lib/show-booking";
 
 const Body = z.object({
@@ -13,13 +14,15 @@ const Body = z.object({
     .string()
     .transform((s) => s.replace(/\D/g, "").slice(-10))
     .pipe(z.string().regex(/^[6-9]\d{9}$/, "Please enter a valid 10-digit mobile number")),
-  email: z.union([z.string().trim().email("Please enter a valid email"), z.literal("")]).optional(),
   message: z.string().trim().max(1000).optional(),
   website: z.string().optional(), // honeypot
 });
 
 /** Starts a show booking: validates, re-prices on the server, holds the date and opens a Razorpay order. */
 export async function POST(req: Request) {
+  const session = await getSession();
+  if (!session?.user?.id || !session.user.email)
+    return NextResponse.json({ error: "बुकिंग के लिए कृपया Google से लॉग-इन करें। Please sign in with Google to book." }, { status: 401 });
   const p = Body.safeParse(await req.json().catch(() => ({})));
   if (!p.success) return NextResponse.json({ error: p.error.issues[0]?.message || "Invalid request" }, { status: 400 });
   if (p.data.website) return NextResponse.json({ error: "Invalid request" }, { status: 400 });
@@ -28,6 +31,8 @@ export async function POST(req: Request) {
   try {
     const { booking, order } = await createShowBooking({
       ...rest,
+      userId: session.user.id,
+      email: session.user.email,
       answers: Object.fromEntries(Object.entries(answers).map(([k, v]) => [k, String(v)])),
     });
     return NextResponse.json({

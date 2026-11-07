@@ -18,10 +18,10 @@ export default function Footer() {
             <div className="mt-10 flex flex-wrap gap-4">
               <Magnetic>
                 <Link
-                  href="/booking"
+                  href="/booking#book"
                   className="inline-flex h-14 items-center rounded-full bg-saffron px-8 text-sm font-semibold uppercase tracking-[0.16em] text-night transition-colors hover:bg-marigold"
                 >
-                  Send an enquiry
+                  Book now
                 </Link>
               </Magnetic>
               <Magnetic>

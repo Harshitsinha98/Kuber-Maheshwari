@@ -330,6 +330,7 @@ CREATE TABLE "CalendarDay" (
 CREATE TABLE "ShowBooking" (
     "id" TEXT NOT NULL,
     "ref" TEXT NOT NULL,
+    "userId" TEXT,
     "date" TEXT NOT NULL,
     "serviceId" TEXT,
     "serviceName" TEXT NOT NULL,
@@ -373,4 +374,7 @@ CREATE INDEX "ShowBooking_date_idx" ON "ShowBooking"("date");
 
 -- CreateIndex
 CREATE INDEX "ShowBooking_status_idx" ON "ShowBooking"("status");
+
+-- CreateIndex
+CREATE INDEX "ShowBooking_userId_idx" ON "ShowBooking"("userId");
 
