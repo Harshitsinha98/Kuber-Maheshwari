@@ -14,7 +14,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const nav = { perms: s.access.perms, team: isOwnerKind(s.access.kind) };
   const roleLabel = { owner: "Owner", coowner: "Co-owner", employee: "Employee", none: "" }[s.access.kind];
   const newEnquiries = can(s.access, "enquiries") ? await safe(() => prisma.enquiry.count({ where: { handled: false } }), 0) : 0;
-  const badges = { "/admin/enquiries": newEnquiries };
+  // Booking requests to confirm + paid bookings whose date was taken meanwhile
+  const showsToAct = can(s.access, "showbookings")
+    ? await safe(() => prisma.showBooking.count({ where: { status: { in: ["REQUESTED", "CONFLICT"] } } }), 0)
+    : 0;
+  const badges = { "/admin/enquiries": newEnquiries, "/admin/show-bookings": showsToAct };
   const first = (s.user.name || "").split(" ")[0];
 
   return (

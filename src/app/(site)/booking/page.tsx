@@ -7,10 +7,16 @@ import { bookingFaqs } from "@/lib/faqs";
 import { Reveal, SplitText } from "@/components/motion/Reveal";
 import { ArrowIcon, WhatsappIcon } from "@/components/site/Icons";
 import { site, waLink } from "@/lib/site";
+import BookingWizard from "@/components/booking/BookingWizard";
+import { safe } from "@/lib/prisma";
+import { razorpayEnabled, razorpayTestMode } from "@/lib/razorpay";
+import { bookingWindow, getPublicSetup } from "@/lib/show-booking";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Book Kuber Maheshwari for your event",
-  description: "Invite Kuber Maheshwari for Sundarkand, Bhajan Sandhya, Bhajan Clubbing, Jagran, Kirtan or weddings. Send an enquiry, call or WhatsApp.",
+  description: "Check Kuber Maheshwari's available dates and book Sundarkand, Bhajan Sandhya, Bhajan Clubbing, Jagran, Kirtan or weddings online, or send an enquiry, call or WhatsApp.",
 };
 
 // Only facts from Kuber ji's own profile.
@@ -20,16 +26,25 @@ const facts = [
   ["देशभर में", "मंचीय प्रस्तुतियाँ"],
 ];
 
-const steps = [
+const enquirySteps = [
   ["01", "जानकारी भेजें", "आयोजन का प्रकार, तारीख और शहर बताइए।"],
   ["02", "हमारा कॉल", "टीम आपसे संपर्क करके सारी बातें तय करेगी।"],
   ["03", "तारीख पक्की", "बुकिंग कन्फर्म, और आपका आयोजन भक्तिमय।"],
+];
+
+const onlineSteps = [
+  ["01", "तारीख चुनें", "कैलेंडर में खाली तारीख देखें और चुनें।"],
+  ["02", "विवरण भरें", "कार्यक्रम, स्थान और आयोजन की जानकारी। कीमत तुरंत दिखेगी।"],
+  ["03", "तारीख पक्की", "अग्रिम राशि ऑनलाइन दें, तारीख उसी समय आपके नाम।"],
 ];
 
 const occasions = ["संगीतमय सुन्दरकाण्ड", "भजन संध्या", "भजन क्लबिंग", "भक्ति फ्यूज़न", "माता जागरण", "श्याम कीर्तन", "वैवाहिक आयोजन"];
 
 export default async function Booking({ searchParams }: { searchParams: Promise<{ type?: string }> }) {
   const { type } = await searchParams;
+  const setup = await safe(() => getPublicSetup(), null);
+  const live = Boolean(setup && setup.services.length && setup.locations.length);
+  const steps = live ? onlineSteps : enquirySteps;
   return (
     <>
       {/* ---------- Hero ---------- */}
@@ -50,7 +65,7 @@ export default async function Booking({ searchParams }: { searchParams: Promise<
             </Reveal>
             <Reveal delay={0.4}>
               <div className="mt-8 flex flex-wrap gap-3">
-                <a href="#enquiry" className="shine inline-flex h-14 items-center rounded-full bg-saffron px-8 font-hindi text-lg font-semibold text-night shadow-[0_14px_50px_-10px_rgba(232,130,12,0.9)]">
+                <a href={live ? "#book" : "#enquiry"} className="shine inline-flex h-14 items-center rounded-full bg-saffron px-8 font-hindi text-lg font-semibold text-night shadow-[0_14px_50px_-10px_rgba(232,130,12,0.9)]">
                   अभी बुक करें
                 </a>
                 <a href={waLink()} target="_blank" rel="noopener" className="inline-flex h-14 items-center gap-2 rounded-full bg-[#1f9d55] px-7 font-hindi text-lg font-semibold text-white">
@@ -125,12 +140,39 @@ export default async function Booking({ searchParams }: { searchParams: Promise<
         </ol>
       </section>
 
+      {/* ---------- Availability calendar + online booking ---------- */}
+      {live && setup && (
+        <section id="book" className="mx-auto max-w-[1500px] scroll-mt-24 px-5 pb-24 md:px-10">
+          <Reveal>
+            <p className="font-hindi text-lg text-saffron">उपलब्धता · Availability</p>
+            <h2 className="mt-2 font-hindi text-4xl leading-[1.4] text-ivory md:text-5xl">तारीख देखें, अभी बुक करें</h2>
+            <p className="mt-2 max-w-2xl text-ivory/65">See which dates Kuber ji is free, choose your programme and get the price instantly. Pay a small advance online and the date is yours.</p>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <div className="mt-10 rounded-[30px] bg-gradient-to-br from-saffron/50 via-gold/25 to-maroon/60 p-px">
+              <div className="rounded-[29px] bg-night-2 p-5 md:p-10">
+                <BookingWizard
+                  services={setup.services}
+                  locations={setup.locations}
+                  questions={setup.questions}
+                  rules={setup.rules}
+                  bookable={bookingWindow(setup.rules)}
+                  paymentsEnabled={razorpayEnabled()}
+                  testMode={razorpayTestMode()}
+                  defaultService={type}
+                />
+              </div>
+            </div>
+          </Reveal>
+        </section>
+      )}
+
       {/* ---------- Form + contact ---------- */}
       <section id="enquiry" className="mx-auto grid max-w-[1500px] scroll-mt-24 gap-8 px-5 pb-32 md:px-10 lg:grid-cols-[1.35fr_1fr]">
         <Reveal>
           <div className="relative rounded-[28px] bg-gradient-to-br from-saffron/60 via-gold/30 to-maroon/60 p-px">
             <div className="rounded-[27px] bg-night-2 p-6 md:p-10">
-              <h2 className="font-hindi text-3xl leading-[1.4] text-ivory md:text-4xl">आयोजन की जानकारी भेजें</h2>
+              <h2 className="font-hindi text-3xl leading-[1.4] text-ivory md:text-4xl">{live ? "कोई सवाल? पूछताछ भेजें" : "आयोजन की जानकारी भेजें"}</h2>
               <p className="mt-1 text-sm text-muted">We usually call back within a few hours.</p>
               <div className="mt-8">
                 <EnquiryForm defaultType={type} />

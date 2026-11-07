@@ -17,6 +17,9 @@ const I = {
   whatsapp: "M12 3a9 9 0 0 0-7.7 13.6L3 21l4.5-1.2A9 9 0 1 0 12 3z",
   team: "M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 6.5M18 14a5.5 5.5 0 0 1 3.5 6",
   social: "M6 12a2.5 2.5 0 1 0 0 .01M18 6a2.5 2.5 0 1 0 0 .01M18 18a2.5 2.5 0 1 0 0 .01M8.3 11 15.7 7M8.3 13l7.4 4",
+  shows: "M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z",
+  calendar: "M7 3v3m10-3v3M4 9h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM8 13h2m4 0h2m-8 4h2m4 0h2",
+  pricing: "M4 7h10M18 7h2M4 17h4M12 17h8M14 5v4M8 15v4",
 };
 
 /** perm: section key an employee needs; "team": owners / co-owners only */
@@ -33,6 +36,14 @@ const groups: { title: string; items: Item[] }[] = [
       { href: "/admin/bookings", label: "Bookings", icon: "bookings", perm: "bookings" },
       { href: "/admin/scan", label: "Scan Tickets", icon: "scan", perm: "scan" },
       { href: "/admin/enquiries", label: "Enquiries", icon: "enquiries", perm: "enquiries" },
+    ],
+  },
+  {
+    title: "Show bookings",
+    items: [
+      { href: "/admin/show-bookings", label: "Show Bookings", icon: "shows", perm: "showbookings" },
+      { href: "/admin/calendar", label: "Calendar", icon: "calendar", perm: "calendar" },
+      { href: "/admin/booking-setup", label: "Booking Setup", icon: "pricing", perm: "pricing" },
     ],
   },
   {
